@@ -100,21 +100,21 @@ public class ListViewAdapter extends BaseAdapter
         }
         else
         {
-            view = View.inflate(mContext, R.layout.student_listview, null);
+            view = View.inflate(mContext, R.layout.product_listview, null);
         }
 
-        ProductBean studentBean = productBeanList.get(position);
-        if (studentBean == null)
+        ProductBean productBean = productBeanList.get(position);
+        if (productBean == null)
         {
-            studentBean = new ProductBean("NoName","NoDesc");
+            productBean = new ProductBean("NoName","NoDesc");
         }
 
         //更新数据
         final TextView nameTextView = (TextView) view.findViewById(R.id.showStuName);
-        nameTextView.setText(studentBean.getName());
+        nameTextView.setText(productBean.getName());
 
         TextView descTextView = (TextView)view.findViewById(R.id.showStuDesc);
-        descTextView.setText(studentBean.getDesc());
+        descTextView.setText(productBean.getDesc());
 
         final int removePosition = position;
 

@@ -36,7 +36,7 @@ public class ProductActivity extends AppCompatActivity
     /**
      * 保存数据
      */
-    private List<ProductBean> studentBeanList = new ArrayList<ProductBean>();
+    private List<ProductBean> productBeanList = new ArrayList<ProductBean>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -48,7 +48,7 @@ public class ProductActivity extends AppCompatActivity
 
         //加载listview
         listView = (ListView) findViewById(R.id.listView);
-        listViewAdapter = new ListViewAdapter(mContext,studentBeanList);
+        listViewAdapter = new ListViewAdapter(mContext,productBeanList);
         listView.setAdapter(listViewAdapter);
 
         //save button的点击事件
@@ -58,7 +58,7 @@ public class ProductActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                saveStudentMessage();
+                saveProductMessage();
             }
         });
     }
@@ -68,7 +68,7 @@ public class ProductActivity extends AppCompatActivity
     /**
      * 保存学生的信息
      */
-    private void saveStudentMessage()
+    private void saveProductMessage()
     {
         EditText nameEditText = (EditText) findViewById(R.id.nameEditText);
         EditText descEditText = (EditText) findViewById(R.id.descEditText);
@@ -80,9 +80,9 @@ public class ProductActivity extends AppCompatActivity
         }
 
         //判断该学生是否存在
-        for (ProductBean studentBean : studentBeanList)
+        for (ProductBean productBean : productBeanList)
         {
-            if (studentBean.getName().equals(nameEditText.getText().toString()))
+            if (productBean.getName().equals(nameEditText.getText().toString()))
             {
                 Toast.makeText(mContext,nameEditText.getText().toString() + "已经存在",Toast.LENGTH_SHORT).show();
                 return;
@@ -90,8 +90,8 @@ public class ProductActivity extends AppCompatActivity
         }
 
 
-        ProductBean studentBean = new ProductBean(nameEditText.getText().toString(),descEditText.getText().toString());
-        studentBeanList.add(studentBean);
+        ProductBean productBean = new ProductBean(nameEditText.getText().toString(),descEditText.getText().toString());
+        productBeanList.add(productBean);
 
         listViewAdapter.notifyDataSetChanged();
     }
