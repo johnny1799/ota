@@ -106,7 +106,7 @@ public class ListViewAdapter extends BaseAdapter
         ProductBean productBean = productBeanList.get(position);
         if (productBean == null)
         {
-            productBean = new ProductBean("NoName","NoDesc");
+            productBean = new ProductBean("NoName");
         }
 
         //更新数据

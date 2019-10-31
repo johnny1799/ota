@@ -15,10 +15,9 @@ public class ProductBean
 
     }
 
-    public ProductBean(String name, String desc)
+    public ProductBean(String name)
     {
         this.name = name;
-        this.desc = desc;
     }
 
     public int getId()

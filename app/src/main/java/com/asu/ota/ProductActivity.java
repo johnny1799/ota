@@ -71,11 +71,10 @@ public class ProductActivity extends AppCompatActivity
     private void saveProductMessage()
     {
         EditText nameEditText = (EditText) findViewById(R.id.nameEditText);
-        EditText descEditText = (EditText) findViewById(R.id.descEditText);
 
-        if ("".equals(nameEditText.getText().toString())||"".equals(descEditText.getText().toString()))
+        if ("".equals(nameEditText.getText().toString()))
         {
-            Toast.makeText(mContext,"姓名和描述信息都不能为空",Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,"产品名不能为空",Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -90,7 +89,7 @@ public class ProductActivity extends AppCompatActivity
         }
 
 
-        ProductBean productBean = new ProductBean(nameEditText.getText().toString(),descEditText.getText().toString());
+        ProductBean productBean = new ProductBean(nameEditText.getText().toString());
         productBeanList.add(productBean);
 
         listViewAdapter.notifyDataSetChanged();
