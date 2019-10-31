@@ -2,16 +2,23 @@ package com.asu.ota;
 
 import java.util.ArrayList;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.asu.ota.database.DatabaseHelper;
+
+import java.util.HashMap;
 import java.util.List;
 
 public class ProductActivity extends AppCompatActivity
@@ -20,29 +27,38 @@ public class ProductActivity extends AppCompatActivity
     /**
      * Context
      */
-    private Context mContext;
+    private static Context mContext;
 
 
     /**
      * listview
      */
-    private ListView listView;
+    private static ListView listView;
 
     /**
      * 适配器
      */
-    private ListViewAdapter listViewAdapter;
+    private static ListViewAdapter listViewAdapter;
 
     /**
      * 保存数据
      */
-    private List<ProductBean> productBeanList = new ArrayList<ProductBean>();
+    private static List<ProductBean> productBeanList = new ArrayList<ProductBean>();
+
+    /**
+     * 数据库操作驱动
+     */
+    public static DatabaseHelper helper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.product_main);
+
+        //加载数据库
+        helper = new DatabaseHelper(this);
+        helper.getWritableDatabase();
 
         this.mContext = this;
 
@@ -61,12 +77,45 @@ public class ProductActivity extends AppCompatActivity
                 saveProductMessage();
             }
         });
+
+        init();
+    }
+
+    // 数组
+    private SimpleAdapter listItemAdapter;
+    // 初始化数据
+    private void init() {
+        productBeanList = new ArrayList<ProductBean>();
+        SQLiteDatabase db = helper.getReadableDatabase();
+        query(db);
+//        listItemAdapter = new SimpleAdapter(getApplicationContext(), productBeanList,// 数据源
+//                R.layout.product_listview, new String[]{"name", "delete"}, new int[]{
+//                R.id.showProName, R.id.showDeleteButton});
+    }
+
+    public static void query(SQLiteDatabase db){
+        //查询Product表中所有的数据
+        Cursor cursor = db.query("Product", null, null, null, null, null, null);
+        productBeanList.clear();
+        //查询
+        if (cursor.moveToFirst()) {
+            while (cursor.moveToNext()) {
+                String name = cursor.getString(cursor.getColumnIndex("name"));
+                ProductBean productBean = new ProductBean();
+                productBean.setName(name);
+                productBeanList.add(productBean);
+            }
+        }
+        cursor.close();
+        db.close();
+        listViewAdapter = new ListViewAdapter(mContext,productBeanList);
+        listView.setAdapter(listViewAdapter);
     }
 
 
 
     /**
-     * 保存学生的信息
+     * 保存产品的信息
      */
     private void saveProductMessage()
     {
@@ -78,7 +127,7 @@ public class ProductActivity extends AppCompatActivity
             return;
         }
 
-        //判断该学生是否存在
+        //判断该产品是否存在
         for (ProductBean productBean : productBeanList)
         {
             if (productBean.getName().equals(nameEditText.getText().toString()))
@@ -92,7 +141,16 @@ public class ProductActivity extends AppCompatActivity
         ProductBean productBean = new ProductBean(nameEditText.getText().toString());
         productBeanList.add(productBean);
 
-        listViewAdapter.notifyDataSetChanged();
+        //入库
+        SQLiteDatabase db = helper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        //添加第一组数据
+        values.put("name", productBean.getName());
+        db.insert("Product", null, values);
+
+        //装载数据
+        query(db);
+        //listViewAdapter.notifyDataSetChanged();
     }
 
 }

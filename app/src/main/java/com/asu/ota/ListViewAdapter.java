@@ -1,12 +1,15 @@
 package com.asu.ota;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.asu.ota.database.DatabaseHelper;
 
 import java.util.List;
 
@@ -110,11 +113,8 @@ public class ListViewAdapter extends BaseAdapter
         }
 
         //更新数据
-        final TextView nameTextView = (TextView) view.findViewById(R.id.showStuName);
+        final TextView nameTextView = (TextView) view.findViewById(R.id.showProName);
         nameTextView.setText(productBean.getName());
-
-        TextView descTextView = (TextView)view.findViewById(R.id.showStuDesc);
-        descTextView.setText(productBean.getDesc());
 
         final int removePosition = position;
 
@@ -125,7 +125,16 @@ public class ListViewAdapter extends BaseAdapter
             @Override
             public void onClick(View v)
             {
+
+                //数据库删除
+                String name = productBeanList.get(removePosition).getName();
+                SQLiteDatabase db = ProductActivity.helper.getWritableDatabase();
+                db.delete("Product","name = ?",new String[] {name});
+
                 deleteButtonAction(removePosition);
+
+                //重新加载列表
+                ProductActivity.query(db);
             }
         });
 
@@ -137,6 +146,6 @@ public class ListViewAdapter extends BaseAdapter
     {
         productBeanList.remove(position);
 
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
     }
 }
