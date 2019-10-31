@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,7 +26,7 @@ public class ProductActivity extends AppCompatActivity
     /**
      * Context
      */
-    private static Context mContext;
+    public static Context mContext;
 
 
     /**
@@ -78,20 +77,10 @@ public class ProductActivity extends AppCompatActivity
             }
         });
 
-        init();
-    }
-
-    // 数组
-    private SimpleAdapter listItemAdapter;
-    // 初始化数据
-    private void init() {
-        productBeanList = new ArrayList<ProductBean>();
         SQLiteDatabase db = helper.getReadableDatabase();
         query(db);
-//        listItemAdapter = new SimpleAdapter(getApplicationContext(), productBeanList,// 数据源
-//                R.layout.product_listview, new String[]{"name", "delete"}, new int[]{
-//                R.id.showProName, R.id.showDeleteButton});
     }
+
 
     public static void query(SQLiteDatabase db){
         //查询Product表中所有的数据
@@ -152,5 +141,6 @@ public class ProductActivity extends AppCompatActivity
         query(db);
         //listViewAdapter.notifyDataSetChanged();
     }
+
 
 }

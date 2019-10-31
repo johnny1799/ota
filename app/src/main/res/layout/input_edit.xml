@@ -5,18 +5,16 @@
   android:layout_height="fill_parent"
   android:orientation="vertical">
   <TextView android:layout_width="fill_parent"
-  android:layout_height="wrap_content" 
-  android:text="输入要修改的索引"></TextView>
-  <EditText android:layout_width="fill_parent" 
-  android:layout_height="wrap_content" 
-  android:id="@+id/input_edit_number" 
-  android:singleLine="true" 
-  android:digits="0123456789"></EditText>
+  android:layout_height="wrap_content"
+  android:text="产品名称"></TextView>
+  <EditText android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:id="@+id/input_edit_oldname"></EditText>
   <TextView android:layout_width="fill_parent" 
   android:layout_height="wrap_content" 
-  android:text="内容修改为"></TextView>
+  android:text="名称修改为"></TextView>
   <EditText android:layout_width="fill_parent" 
   android:layout_height="wrap_content" 
-  android:id="@+id/input_edit_string" 
+  android:id="@+id/input_edit_newname"
   android:singleLine="true"></EditText>
 </LinearLayout>
