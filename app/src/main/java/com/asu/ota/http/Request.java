@@ -1,9 +1,13 @@
 package com.asu.ota.http;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -57,6 +61,31 @@ public class Request {
             }
         }
         return result;
+    }
+
+    public String  sendGet(String path)throws Exception{
+        String responseText = "";
+        try{
+            URL url = new URL(path);
+            //2. HttpURLConnection
+            HttpURLConnection conn=(HttpURLConnection)url.openConnection();
+            //3. set(GET)
+            conn.setRequestMethod("GET");
+            //4. getInputStream
+            InputStream is = conn.getInputStream();
+            //5. 解析is，获取responseText，这里用缓冲字符流
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            while((line=reader.readLine()) != null){
+                sb.append(line);
+            }
+            //获取响应文本
+            responseText = sb.toString();
+        }catch (Exception e){
+            Log.e("product list:", e.getMessage());
+        }
+        return  responseText;
     }
 
 }
