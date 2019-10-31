@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +17,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.asu.ota.database.DatabaseHelper;
+import com.asu.ota.http.Request;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +57,11 @@ public class ProductActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        //网络连接不能放在主线程
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.product_main);
 
@@ -78,6 +88,29 @@ public class ProductActivity extends AppCompatActivity
         });
 
         SQLiteDatabase db = helper.getReadableDatabase();
+
+        //清空表数据,接口数据入库
+        try{
+            clearTable("Product");
+            String url = "http://192.168.11.106:8089/product/list";
+            String result = new Request().sendGet(url);
+            JSONObject jo = new JSONObject(new String(result));
+            JSONObject jo1 =(JSONObject)jo.get("data");
+            JSONArray  jsonArray = (JSONArray)jo1.get("list");
+            for(int i=0;i<jsonArray.length();i++) {
+                String id =jsonArray.getJSONObject(i).get("id")+"";
+                String name =jsonArray.getJSONObject(i).get("name")+"";
+                //入库
+                ContentValues values = new ContentValues();
+                //添加第一组数据
+                values.put("name", name);
+                values.put("dbid", id);
+                db.insert("Product", null, values);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //查询刷新数据
         query(db);
     }
 
@@ -140,6 +173,19 @@ public class ProductActivity extends AppCompatActivity
         //装载数据
         query(db);
         //listViewAdapter.notifyDataSetChanged();
+    }
+
+    public void clearTable(String table){
+        String sql = "DELETE FROM " + table +";";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(sql);
+        revertSeq(table);
+    }
+
+    private void revertSeq(String table) {
+        String sql = "update sqlite_sequence set seq=0 where name='"+table+"'";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(sql);
     }
 
 
