@@ -6,7 +6,7 @@ public class ProductBean
 
     private String name;
 
-    private int score;
+    private int dbid;
 
     private String desc;
 
@@ -40,14 +40,12 @@ public class ProductBean
         this.name = name;
     }
 
-    public int getScore()
-    {
-        return score;
+    public int getDbid() {
+        return dbid;
     }
 
-    public void setScore(int score)
-    {
-        this.score = score;
+    public void setDbid(int dbid) {
+        this.dbid = dbid;
     }
 
     public String getDesc()
