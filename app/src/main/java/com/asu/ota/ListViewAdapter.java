@@ -19,9 +19,7 @@ import com.asu.ota.database.DatabaseHelper;
 
 import java.util.List;
 
-/**
- * Created by wzj on 2017/2/11.
- */
+
 public class ListViewAdapter extends BaseAdapter {
     /**
      * Context

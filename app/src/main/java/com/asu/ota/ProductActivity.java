@@ -92,7 +92,7 @@ public class ProductActivity extends AppCompatActivity
         //清空表数据,接口数据入库
         try{
             clearTable("Product");
-            String url = "http://192.168.11.106:8089/product/list";
+            String url = "http://192.168.11.220:8089/product/list";
             String result = new Request().sendGet(url);
             JSONObject jo = new JSONObject(new String(result));
             JSONObject jo1 =(JSONObject)jo.get("data");

@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }else{
                     try {
-                        String url = "http://192.168.11.106:8089/home/login";
+                        String url = "http://192.168.11.220:8089/home/login";
                         String param = "username="+userName+"&password="+psw;
                         String result = new Request().sendPost(url,param);
                         JSONObject jo = new JSONObject(new String(result));
