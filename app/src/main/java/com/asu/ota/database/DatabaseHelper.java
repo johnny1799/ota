@@ -14,7 +14,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_PRODUCT = "create table Product ("
             + "id integer primary key autoincrement, "
-            + "name text"
+            + "name text,"
+            + "dbid integer"
             + ")";
 
 
