@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.asu.ota.database.DatabaseHelper;
+import com.asu.ota.http.Request;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -119,15 +123,30 @@ public class ListViewAdapter extends BaseAdapter {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //数据库删除
                 SQLiteDatabase db = ProductActivity.helper.getWritableDatabase();
-                db.delete("Product", "name = ?", new String[]{name});
 
-                deleteButtonAction(removePosition);
+                int dbid = 0;
+                Cursor cursor = db.rawQuery("select dbid from product where name=?",new String[]{name});
+                while (cursor.moveToNext()) {
+                     dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
+                }
+                try{
+                    String url  = "http://192.168.11.220:8089/product/delete?id="+dbid;
+                    String result = new Request().sendDelete(url);
+                    JSONObject jo = new JSONObject(new String(result));
+                    Integer code = (Integer)jo.get("code");
+                    if(code==0){
+                        //数据库删除
+                        db.delete("Product", "name = ?", new String[]{name});
 
-                //重新加载列表
-                ProductActivity.query(db);
+                        deleteButtonAction(removePosition);
+
+                        //重新加载列表
+                        ProductActivity.query(db);
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -170,16 +189,31 @@ public class ListViewAdapter extends BaseAdapter {
                                                     .show();
                                         } else {
                                             SQLiteDatabase db = ProductActivity.helper.getWritableDatabase();
-                                            ContentValues values = new ContentValues();
-                                            values.put("name",nname);
-                                            db.update("Product",values,"name=?",new String[] {name});
-                                            //重新加载列表
-                                            ProductActivity.query(db);
+                                            try{
+                                                int dbid = 0;
+                                                Cursor cursor = db.rawQuery("select dbid from product where name=?",new String[]{name});
+                                                while (cursor.moveToNext()) {
+                                                    dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
+                                                }
+                                                String url  = "http://192.168.11.220:8089/product/edit?id="+dbid+"&name="+nname+"&comment=";
+                                                String result = new Request().sendPut(url);
+                                                JSONObject jo = new JSONObject(new String(result));
+                                                Integer code = (Integer)jo.get("code");
+                                                if(code == 0){
+                                                    ContentValues values = new ContentValues();
+                                                    values.put("name",nname);
+                                                    db.update("Product",values,"name=?",new String[] {name});
+                                                    //重新加载列表
+                                                    ProductActivity.query(db);
 
-                                            Toast.makeText(
-                                                    mContext,
-                                                    "数据修改为:" + nname + "",
-                                                    Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(
+                                                            mContext,
+                                                            "数据修改为:" + nname + "",
+                                                            Toast.LENGTH_SHORT).show();
+                                                }
+                                            }catch (Exception e){
+                                                e.printStackTrace();
+                                            }
                                         }
 
                                     }
