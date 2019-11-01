@@ -3,6 +3,7 @@ package com.asu.ota.http;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,6 +11,10 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Request {
 
@@ -84,6 +89,57 @@ public class Request {
             responseText = sb.toString();
         }catch (Exception e){
             Log.e("product list:", e.getMessage());
+        }
+        return  responseText;
+    }
+
+    //delete请求
+    public String  sendDelete(String path)throws Exception{
+        String responseText = "";
+        try{
+            URL url = new URL(path);
+            //2. HttpURLConnection
+            HttpURLConnection conn=(HttpURLConnection)url.openConnection();
+            //3. set(GET)
+            conn.setRequestMethod("DELETE");
+            //4. getInputStream
+            InputStream is = conn.getInputStream();
+            //5. 解析is，获取responseText，这里用缓冲字符流
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            while((line=reader.readLine()) != null){
+                sb.append(line);
+            }
+            //获取响应文本
+            responseText = sb.toString();
+        }catch (Exception e){
+            Log.e("product delete:", e.getMessage());
+        }
+        return  responseText;
+    }
+    //put 请求
+    public String  sendPut(String path)throws Exception{
+        String responseText = "";
+        try{
+            URL url = new URL(path);
+            //2. HttpURLConnection
+            HttpURLConnection conn=(HttpURLConnection)url.openConnection();
+            //3. set(GET)
+            conn.setRequestMethod("PUT");
+            //4. getInputStream
+            InputStream is = conn.getInputStream();
+            //5. 解析is，获取responseText，这里用缓冲字符流
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            while((line=reader.readLine()) != null){
+                sb.append(line);
+            }
+            //获取响应文本
+            responseText = sb.toString();
+        }catch (Exception e){
+            Log.e("product delete:", e.getMessage());
         }
         return  responseText;
     }
