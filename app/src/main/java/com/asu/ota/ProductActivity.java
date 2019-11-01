@@ -163,16 +163,29 @@ public class ProductActivity extends AppCompatActivity
         ProductBean productBean = new ProductBean(nameEditText.getText().toString());
         productBeanList.add(productBean);
 
-        //入库
-        SQLiteDatabase db = helper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        //添加第一组数据
-        values.put("name", productBean.getName());
-        db.insert("Product", null, values);
+        try {
+            String url = "http://192.168.11.220:8089/product/add";
+            String param = "name="+productBean.getName()+"&comment=";
+            String result = new Request().sendPost(url,param);
+            JSONObject jo = new JSONObject(new String(result));
+            Integer code = (Integer)jo.get("code");
 
-        //装载数据
-        query(db);
-        //listViewAdapter.notifyDataSetChanged();
+            if(code == 0){
+                Integer dbid = (Integer)jo.get("data");
+                //入库
+                SQLiteDatabase db = helper.getWritableDatabase();
+                ContentValues values = new ContentValues();
+                //添加第一组数据
+                values.put("name", productBean.getName());
+                values.put("dbid", dbid);
+                db.insert("Product", null, values);
+
+                //装载数据
+                query(db);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void clearTable(String table){
