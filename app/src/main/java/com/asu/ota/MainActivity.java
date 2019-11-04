@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.asu.ota.database.DatabaseHelper;
 import com.asu.ota.http.Request;
+import com.idescout.sql.SqlScoutServer;
 
 import org.json.JSONObject;
 
@@ -33,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+       SqlScoutServer.create(this, getPackageName());
+
         //网络连接不能放在主线程
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
