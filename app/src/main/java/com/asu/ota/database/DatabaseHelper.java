@@ -20,7 +20,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_PACKAGE = "create table Package ("
             + "id integer primary key autoincrement, "
             + "version text,"
-            + "dbid integer"
+            + "dbid integer,"
+            + "productid integer"
             + ")";
 
 

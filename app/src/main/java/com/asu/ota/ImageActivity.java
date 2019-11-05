@@ -26,7 +26,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImageActivity extends AppCompatActivity implements AdapterView.OnItemClickListener
+public class ImageActivity extends AppCompatActivity
 {
 
     /**
@@ -54,6 +54,7 @@ public class ImageActivity extends AppCompatActivity implements AdapterView.OnIt
      * 数据库操作驱动
      */
     public static DatabaseHelper helper;
+    static int  productId=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -69,7 +70,7 @@ public class ImageActivity extends AppCompatActivity implements AdapterView.OnIt
         //新页面接收数据
         Bundle bundle = this.getIntent().getExtras();
         //接收产品id
-        int productId = bundle.getInt("productId");
+        productId = bundle.getInt("productId");
 
         //加载数据库
         helper = new DatabaseHelper(this);
@@ -90,7 +91,7 @@ public class ImageActivity extends AppCompatActivity implements AdapterView.OnIt
             @Override
             public void onClick(View v)
             {
-                saveVersionMessage();
+                saveImageMessage();
             }
         });
 
@@ -112,6 +113,7 @@ public class ImageActivity extends AppCompatActivity implements AdapterView.OnIt
                 //添加第一组数据
                 values.put("version", version);
                 values.put("dbid", id);
+                values.put("productid", productId);
                 db.insert("Package", null, values);
             }
         }catch (Exception e){
@@ -124,7 +126,7 @@ public class ImageActivity extends AppCompatActivity implements AdapterView.OnIt
 
     public static void query(SQLiteDatabase db){
         //查询Package表中所有的数据
-        Cursor cursor = db.query("Package", null, null, null, null, null, null);
+        Cursor cursor = db.rawQuery("select dbid,version from package where productid=?",new String[]{productId+""});
         versionBeanList.clear();
         //查询
         if (cursor.moveToFirst()) {
@@ -146,20 +148,20 @@ public class ImageActivity extends AppCompatActivity implements AdapterView.OnIt
     /**
      * 保存产品的信息
      */
-    private void saveVersionMessage()
+    private void saveImageMessage()
     {
         EditText nameEditText = (EditText) findViewById(R.id.nameEditText);
 
         if ("".equals(nameEditText.getText().toString()))
         {
-            Toast.makeText(mContext,"产品名不能为空",Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,"版本名不能为空",Toast.LENGTH_SHORT).show();
             return;
         }
 
         //判断该产品是否存在
         for (ImageBean versionBean : versionBeanList)
         {
-            if (versionBean.equals(nameEditText.getText().toString()))
+            if (versionBean.getVersion().equals(nameEditText.getText().toString()))
             {
                 Toast.makeText(mContext,nameEditText.getText().toString() + "已经存在",Toast.LENGTH_SHORT).show();
                 return;
@@ -171,8 +173,8 @@ public class ImageActivity extends AppCompatActivity implements AdapterView.OnIt
         versionBeanList.add(versionBean);
 
         try {
-            String url = "http://192.168.11.220:8089/product/add";
-            String param = "name="+versionBean.getVersion()+"&comment=";
+            String url = "http://192.168.11.220:8089/image/version/add";
+            String param = "productId="+productId+"&version="+nameEditText.getText();
             String result = new Request().sendPost(url,param);
             JSONObject jo = new JSONObject(new String(result));
             Integer code = (Integer)jo.get("code");
@@ -183,12 +185,16 @@ public class ImageActivity extends AppCompatActivity implements AdapterView.OnIt
                 SQLiteDatabase db = helper.getWritableDatabase();
                 ContentValues values = new ContentValues();
                 //添加第一组数据
-                values.put("name", versionBean.getVersion());
+                values.put("version", versionBean.getVersion());
                 values.put("dbid", dbid);
+                values.put("productid", productId);
                 db.insert("Package", null, values);
 
                 //装载数据
                 query(db);
+            }else{
+                String msg = (String)jo.get("msg");
+                Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -208,21 +214,4 @@ public class ImageActivity extends AppCompatActivity implements AdapterView.OnIt
         db.execSQL(sql);
     }
 
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-        TextView tv = (TextView)view.findViewById(R.id.showProName);
-        String name  = tv.getText()+"";
-
-        Intent intent =new Intent(ImageActivity.this, ImageActivity.class);
-
-        //用Bundle携带数据
-        Bundle bundle=new Bundle();
-        //传递name参数为tinyphp
-        bundle.putString("name", "name");
-        intent.putExtras(bundle);
-        startActivity(intent);
-
-    }
 }

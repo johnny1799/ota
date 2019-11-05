@@ -117,30 +117,30 @@ public class ImageListViewAdapter extends BaseAdapter{
         final String name = versionBeanList.get(removePosition).getVersion();
 
         //删除按钮点击事件
-        Button deleteButton = (Button) view.findViewById(R.id.showDeleteButton);
+        Button deleteButton = (Button) view.findViewById(R.id.showImgDeleteButton);
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SQLiteDatabase db = ProductActivity.helper.getWritableDatabase();
+                SQLiteDatabase db = ImageActivity.helper.getWritableDatabase();
 
                 int dbid = 0;
-                Cursor cursor = db.rawQuery("select dbid from product where name=?",new String[]{name});
+                Cursor cursor = db.rawQuery("select dbid from package where version=?",new String[]{name});
                 while (cursor.moveToNext()) {
                      dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
                 }
                 try{
-                    String url  = "http://192.168.11.220:8089/product/delete?id="+dbid;
+                    String url  = "http://192.168.11.220:8089/image/version/delete?id="+dbid;
                     String result = new Request().sendDelete(url);
                     JSONObject jo = new JSONObject(new String(result));
                     Integer code = (Integer)jo.get("code");
                     if(code==0){
                         //数据库删除
-                        db.delete("Product", "name = ?", new String[]{name});
+                        db.delete("Package", "version = ? and productid = ?", new String[]{name,ImageActivity.productId+""});
 
                         deleteButtonAction(removePosition);
 
                         //重新加载列表
-                        ProductActivity.query(db);
+                        ImageActivity.query(db);
                     }
                 }catch(Exception e){
                     e.printStackTrace();
@@ -186,7 +186,7 @@ public class ImageListViewAdapter extends BaseAdapter{
                                                     "请输入要修改的产品名称", Toast.LENGTH_SHORT)
                                                     .show();
                                         } else {
-                                            SQLiteDatabase db = ProductActivity.helper.getWritableDatabase();
+                                            SQLiteDatabase db = ImageActivity.helper.getWritableDatabase();
                                             try{
                                                 int dbid = 0;
                                                 Cursor cursor = db.rawQuery("select dbid from product where name=?",new String[]{name});
@@ -202,7 +202,7 @@ public class ImageListViewAdapter extends BaseAdapter{
                                                     values.put("name",nname);
                                                     db.update("Product",values,"name=?",new String[] {name});
                                                     //重新加载列表
-                                                    ProductActivity.query(db);
+                                                    ImageActivity.query(db);
 
                                                     Toast.makeText(
                                                             mContext,
