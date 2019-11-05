@@ -6,11 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,14 +16,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.asu.ota.database.DatabaseHelper;
 import com.asu.ota.http.Request;
 
 import org.json.JSONObject;
 
 import java.util.List;
 
-public class ListViewAdapter extends BaseAdapter{
+public class ImageListViewAdapter extends BaseAdapter{
     /**
      * Context
      */
@@ -34,17 +31,17 @@ public class ListViewAdapter extends BaseAdapter{
     /**
      * 数据
      */
-    private List<ProductBean> productBeanList;
+    private List<ImageBean> versionBeanList;
 
     /**
      * 构造函数
      *
      * @param context         context
-     * @param productBeanList productBeanList
+     * @param versionBeanList versionBeanList
      */
-    public ListViewAdapter(Context context, List<ProductBean> productBeanList) {
+    public ImageListViewAdapter(Context context, List<ImageBean> versionBeanList) {
         this.mContext = context;
-        this.productBeanList = productBeanList;
+        this.versionBeanList = versionBeanList;
     }
 
     /**
@@ -54,7 +51,7 @@ public class ListViewAdapter extends BaseAdapter{
      */
     @Override
     public int getCount() {
-        return productBeanList.size();
+        return versionBeanList.size();
     }
 
     /**
@@ -104,20 +101,20 @@ public class ListViewAdapter extends BaseAdapter{
         if (convertView != null) {
             view = convertView;
         } else {
-            view = View.inflate(mContext, R.layout.product_listview, null);
+            view = View.inflate(mContext, R.layout.image_listview, null);
         }
 
-        ProductBean productBean = productBeanList.get(position);
-        if (productBean == null) {
-            productBean = new ProductBean("NoName");
+        ImageBean versionBean = versionBeanList.get(position);
+        if (versionBean == null) {
+            versionBean = new ImageBean("NoName");
         }
 
         //更新数据
         final TextView nameTextView = (TextView) view.findViewById(R.id.showProName);
-        nameTextView.setText(productBean.getName());
+        nameTextView.setText(versionBean.getVersion());
 
         final int removePosition = position;
-        final String name = productBeanList.get(removePosition).getName();
+        final String name = versionBeanList.get(removePosition).getVersion();
 
         //删除按钮点击事件
         Button deleteButton = (Button) view.findViewById(R.id.showDeleteButton);
@@ -152,7 +149,7 @@ public class ListViewAdapter extends BaseAdapter{
         });
 
         //修改按钮点击事件
-        Button updateButton = (Button) view.findViewById(R.id.showUpdateButton);
+        Button updateButton = (Button) view.findViewById(R.id.showOtaButton);
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -239,7 +236,7 @@ public class ListViewAdapter extends BaseAdapter{
     }
 
     private void deleteButtonAction(int position) {
-        productBeanList.remove(position);
+        versionBeanList.remove(position);
 
         //notifyDataSetChanged();
     }

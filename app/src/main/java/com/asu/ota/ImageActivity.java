@@ -1,7 +1,5 @@
 package com.asu.ota;
 
-import java.util.ArrayList;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -26,10 +23,10 @@ import com.asu.ota.http.Request;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
-public class ProductActivity extends AppCompatActivity implements AdapterView.OnItemClickListener
+public class ImageActivity extends AppCompatActivity implements AdapterView.OnItemClickListener
 {
 
     /**
@@ -46,12 +43,12 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
     /**
      * 适配器
      */
-    private static ListViewAdapter listViewAdapter;
+    private static ImageListViewAdapter listViewAdapter;
 
     /**
      * 保存数据
      */
-    private static List<ProductBean> productBeanList = new ArrayList<ProductBean>();
+    private static List<ImageBean> versionBeanList = new ArrayList<>();
 
     /**
      * 数据库操作驱动
@@ -67,7 +64,12 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
             StrictMode.setThreadPolicy(policy);
         }
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.product_main);
+        setContentView(R.layout.image_main);
+
+        //新页面接收数据
+        Bundle bundle = this.getIntent().getExtras();
+        //接收产品id
+        int productId = bundle.getInt("productId");
 
         //加载数据库
         helper = new DatabaseHelper(this);
@@ -76,10 +78,10 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
         this.mContext = this;
 
         //加载listview
-        listView = (ListView) findViewById(R.id.listView);
-        listViewAdapter = new ListViewAdapter(mContext,productBeanList);
+        listView = (ListView) findViewById(R.id.imageListView);
+        listViewAdapter = new ImageListViewAdapter(mContext,versionBeanList);
         listView.setAdapter(listViewAdapter);
-        listView.setOnItemClickListener(this);
+//        listView.setOnItemClickListener(this);
 
         //save button的点击事件
         Button saveButton = (Button) findViewById(R.id.id);
@@ -88,7 +90,7 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
             @Override
             public void onClick(View v)
             {
-                saveProductMessage();
+                saveVersionMessage();
             }
         });
 
@@ -96,21 +98,21 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
 
         //清空表数据,接口数据入库
         try{
-            clearTable("Product");
-            String url = "http://192.168.11.220:8089/product/list";
+            clearTable("Package");
+            String url = "http://192.168.11.220:8089/image/version/list?productId="+productId;
             String result = new Request().sendGet(url);
             JSONObject jo = new JSONObject(new String(result));
             JSONObject jo1 =(JSONObject)jo.get("data");
             JSONArray  jsonArray = (JSONArray)jo1.get("list");
             for(int i=0;i<jsonArray.length();i++) {
                 String id =jsonArray.getJSONObject(i).get("id")+"";
-                String name =jsonArray.getJSONObject(i).get("name")+"";
+                String version =jsonArray.getJSONObject(i).get("version")+"";
                 //入库
                 ContentValues values = new ContentValues();
                 //添加第一组数据
-                values.put("name", name);
+                values.put("version", version);
                 values.put("dbid", id);
-                db.insert("Product", null, values);
+                db.insert("Package", null, values);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -121,21 +123,21 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
 
 
     public static void query(SQLiteDatabase db){
-        //查询Product表中所有的数据
-        Cursor cursor = db.query("Product", null, null, null, null, null, null);
-        productBeanList.clear();
+        //查询Package表中所有的数据
+        Cursor cursor = db.query("Package", null, null, null, null, null, null);
+        versionBeanList.clear();
         //查询
         if (cursor.moveToFirst()) {
             while (cursor.moveToNext()) {
-                String name = cursor.getString(cursor.getColumnIndex("name"));
-                ProductBean productBean = new ProductBean();
-                productBean.setName(name);
-                productBeanList.add(productBean);
+                String version = cursor.getString(cursor.getColumnIndex("version"));
+                ImageBean versionBean = new ImageBean();
+                versionBean.setVersion(version);
+                versionBeanList.add(versionBean);
             }
         }
         cursor.close();
         db.close();
-        listViewAdapter = new ListViewAdapter(mContext,productBeanList);
+        listViewAdapter = new ImageListViewAdapter(mContext,versionBeanList);
         listView.setAdapter(listViewAdapter);
     }
 
@@ -144,7 +146,7 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
     /**
      * 保存产品的信息
      */
-    private void saveProductMessage()
+    private void saveVersionMessage()
     {
         EditText nameEditText = (EditText) findViewById(R.id.nameEditText);
 
@@ -155,9 +157,9 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
         }
 
         //判断该产品是否存在
-        for (ProductBean productBean : productBeanList)
+        for (ImageBean versionBean : versionBeanList)
         {
-            if (productBean.getName().equals(nameEditText.getText().toString()))
+            if (versionBean.equals(nameEditText.getText().toString()))
             {
                 Toast.makeText(mContext,nameEditText.getText().toString() + "已经存在",Toast.LENGTH_SHORT).show();
                 return;
@@ -165,12 +167,12 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
         }
 
 
-        ProductBean productBean = new ProductBean(nameEditText.getText().toString());
-        productBeanList.add(productBean);
+        ImageBean versionBean = new ImageBean(nameEditText.getText().toString());
+        versionBeanList.add(versionBean);
 
         try {
             String url = "http://192.168.11.220:8089/product/add";
-            String param = "name="+productBean.getName()+"&comment=";
+            String param = "name="+versionBean.getVersion()+"&comment=";
             String result = new Request().sendPost(url,param);
             JSONObject jo = new JSONObject(new String(result));
             Integer code = (Integer)jo.get("code");
@@ -181,9 +183,9 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
                 SQLiteDatabase db = helper.getWritableDatabase();
                 ContentValues values = new ContentValues();
                 //添加第一组数据
-                values.put("name", productBean.getName());
+                values.put("name", versionBean.getVersion());
                 values.put("dbid", dbid);
-                db.insert("Product", null, values);
+                db.insert("Package", null, values);
 
                 //装载数据
                 query(db);
@@ -212,20 +214,13 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
 
         TextView tv = (TextView)view.findViewById(R.id.showProName);
         String name  = tv.getText()+"";
-        SQLiteDatabase db = ProductActivity.helper.getWritableDatabase();
 
-        int productId = 0;
-        Cursor cursor = db.rawQuery("select dbid from product where name=?",new String[]{name});
-        while (cursor.moveToNext()) {
-            productId = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
-        }
-
-        Intent intent =new Intent(ProductActivity.this,ImageActivity.class);
+        Intent intent =new Intent(ImageActivity.this, ImageActivity.class);
 
         //用Bundle携带数据
         Bundle bundle=new Bundle();
         //传递name参数为tinyphp
-        bundle.putInt("productId", productId);
+        bundle.putString("name", "name");
         intent.putExtras(bundle);
         startActivity(intent);
 

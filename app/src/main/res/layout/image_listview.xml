@@ -44,6 +44,21 @@
     </LinearLayout>
 
     <LinearLayout
+    android:orientation="horizontal"
+    android:layout_gravity="center"
+    android:layout_width="wrap_content"
+    android:layout_weight="0"
+    android:layout_height="wrap_content">
+
+    <Button
+        android:layout_gravity="center"
+        android:text="差分包"
+        android:id="@+id/showOtaButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
         android:orientation="horizontal"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
@@ -52,8 +67,8 @@
 
         <Button
             android:layout_gravity="center"
-            android:text="UPDATE"
-            android:id="@+id/showUpdateButton"
+            android:text="整包"
+            android:id="@+id/showFullButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </LinearLayout>

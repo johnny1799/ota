@@ -17,6 +17,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + "name text,"
             + "dbid integer"
             + ")";
+    private static final String CREATE_PACKAGE = "create table Package ("
+            + "id integer primary key autoincrement, "
+            + "version text,"
+            + "dbid integer"
+            + ")";
 
 
     private static final String CREATE_OTA = "create table Category ("
@@ -44,6 +49,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_PRODUCT);
+        db.execSQL(CREATE_PACKAGE);
         Toast.makeText(context,"create succcess",Toast.LENGTH_SHORT).show();
     }
 
