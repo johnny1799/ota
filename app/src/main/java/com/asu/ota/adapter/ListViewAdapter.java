@@ -1,4 +1,4 @@
-package com.asu.ota;
+package com.asu.ota.adapter;
 
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -16,7 +16,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.asu.ota.activity.ProductActivity;
+import com.asu.ota.R;
 import com.asu.ota.http.CommonRequest;
+import com.asu.ota.model.ProductBean;
 
 import org.json.JSONObject;
 

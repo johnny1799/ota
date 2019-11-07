@@ -1,4 +1,4 @@
-package com.asu.ota;
+package com.asu.ota.activity;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -7,8 +7,11 @@ import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.asu.ota.R;
+import com.asu.ota.adapter.OtaListViewAdapter;
 import com.asu.ota.database.DatabaseHelper;
 import com.asu.ota.http.CommonRequest;
+import com.asu.ota.model.ImageBean;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

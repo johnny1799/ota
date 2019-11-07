@@ -96,7 +96,7 @@ public class CommonRequest {
             //获取响应文本
             responseText = sb.toString();
         }catch (Exception e){
-            Log.e("product list:", e.getMessage());
+            Log.e(path, e.getMessage());
         }
         return  responseText;
     }

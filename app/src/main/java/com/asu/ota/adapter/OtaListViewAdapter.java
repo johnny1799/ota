@@ -1,4 +1,4 @@
-package com.asu.ota;
+package com.asu.ota.adapter;
 
 import android.content.Context;
 import android.os.Environment;
@@ -9,7 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.asu.ota.R;
 import com.asu.ota.http.CommonRequest;
+import com.asu.ota.model.ImageBean;
 
 import java.util.List;
 

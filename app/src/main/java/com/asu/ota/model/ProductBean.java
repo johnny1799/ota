@@ -1,4 +1,4 @@
-package com.asu.ota;
+package com.asu.ota.model;
 
 public class ProductBean
 {

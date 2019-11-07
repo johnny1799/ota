@@ -1,4 +1,4 @@
-package com.asu.ota;
+package com.asu.ota.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +12,11 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.asu.ota.activity.ImageActivity;
+import com.asu.ota.activity.OtaActivity;
+import com.asu.ota.R;
 import com.asu.ota.http.CommonRequest;
+import com.asu.ota.model.ImageBean;
 
 import org.json.JSONObject;
 
@@ -149,7 +153,7 @@ public class ImageListViewAdapter extends BaseAdapter{
         otaButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent =new Intent(ImageActivity.mContext,OtaActivity.class);
+                Intent intent =new Intent(ImageActivity.mContext, OtaActivity.class);
                 //用Bundle携带数据
                 Bundle bundle=new Bundle();
                 //传递name参数为tinyphp
