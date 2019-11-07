@@ -17,7 +17,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.asu.ota.http.Utils;
+import com.asu.ota.http.CommonRequest;
 import com.idescout.sql.SqlScoutServer;
 
 import org.json.JSONObject;
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         String url = "http://192.168.11.220:8089/home/login";
                         String param = "username="+userName+"&password="+psw;
-                        String result = new Utils().sendPost(url,param);
+                        String result = new CommonRequest().sendPost(url,param);
                         JSONObject jo = new JSONObject(new String(result));
                         Integer code = (Integer)jo.get("code");
                         if(code == 0){

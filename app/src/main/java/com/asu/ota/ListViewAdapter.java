@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.asu.ota.http.Utils;
+import com.asu.ota.http.CommonRequest;
 
 import org.json.JSONObject;
 
@@ -130,7 +130,7 @@ public class ListViewAdapter extends BaseAdapter{
                 }
                 try{
                     String url  = "http://192.168.11.220:8089/product/delete?id="+dbid;
-                    String result = new Utils().sendDelete(url);
+                    String result = new CommonRequest().sendDelete(url);
                     JSONObject jo = new JSONObject(new String(result));
                     Integer code = (Integer)jo.get("code");
                     if(code==0){
@@ -194,7 +194,7 @@ public class ListViewAdapter extends BaseAdapter{
                                                     dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
                                                 }
                                                 String url  = "http://192.168.11.220:8089/product/edit?id="+dbid+"&name="+nname+"&comment=";
-                                                String result = new Utils().sendPut(url);
+                                                String result = new CommonRequest().sendPut(url);
                                                 JSONObject jo = new JSONObject(new String(result));
                                                 Integer code = (Integer)jo.get("code");
                                                 if(code == 0){

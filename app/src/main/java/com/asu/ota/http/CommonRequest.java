@@ -24,7 +24,7 @@ import okio.BufferedSink;
 import okio.Okio;
 import okio.Sink;
 
-public class Utils {
+public class CommonRequest {
 
     //post请求
     public String sendPost(String url, String param) {

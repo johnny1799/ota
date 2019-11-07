@@ -1,8 +1,6 @@
 package com.asu.ota;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.asu.ota.http.Utils;
-
-import org.json.JSONObject;
+import com.asu.ota.http.CommonRequest;
 
 import java.util.List;
 
@@ -120,7 +116,7 @@ public class OtaListViewAdapter extends BaseAdapter{
                 String url = "http://182.92.67.138:801/asu/upload/20190917170422162.exe";
 //                String url = "https://raw.githubusercontent.com/scimence/AndroidPlugin/master/apk/AndroidPlugin_plugin1.apk";
                 String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/backups/apps/AndroidPlugin_plugin1.apk";
-                new Utils().downloadFile(url);
+                new CommonRequest().downloadFile(url);
             }
         });
 

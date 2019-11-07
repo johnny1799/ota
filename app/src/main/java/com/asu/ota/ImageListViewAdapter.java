@@ -12,7 +12,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.asu.ota.http.Utils;
+import com.asu.ota.http.CommonRequest;
 
 import org.json.JSONObject;
 
@@ -126,7 +126,7 @@ public class ImageListViewAdapter extends BaseAdapter{
                 }
                 try{
                     String url  = "http://192.168.11.220:8089/image/version/delete?id="+dbid;
-                    String result = new Utils().sendDelete(url);
+                    String result = new CommonRequest().sendDelete(url);
                     JSONObject jo = new JSONObject(new String(result));
                     Integer code = (Integer)jo.get("code");
                     if(code==0){

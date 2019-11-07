@@ -8,7 +8,7 @@ import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.asu.ota.database.DatabaseHelper;
-import com.asu.ota.http.Utils;
+import com.asu.ota.http.CommonRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -80,7 +80,7 @@ public class OtaActivity extends AppCompatActivity
         //清空表数据,接口数据入库
         try{
             String url = "http://192.168.11.220:8089/image/ota/list?productId="+productId+"&version="+version;
-            String result = new Utils().sendGet(url);
+            String result = new CommonRequest().sendGet(url);
             JSONObject jo = new JSONObject(new String(result));
             JSONObject jo1 =(JSONObject)jo.get("data");
             JSONArray  jsonArray = (JSONArray)jo1.get("list");
