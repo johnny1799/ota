@@ -17,7 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.asu.ota.R;
 import com.asu.ota.adapter.ImageListViewAdapter;
 import com.asu.ota.database.DatabaseHelper;
-import com.asu.ota.http.CommonRequest;
+import com.asu.ota.utils.CommonRequest;
 import com.asu.ota.model.ImageBean;
 
 import org.json.JSONArray;
@@ -100,7 +100,7 @@ public class ImageActivity extends AppCompatActivity
         //清空表数据,接口数据入库
         try{
             clearTable("Package");
-            String url = "http://192.168.11.220:8089/image/version/list?productId="+productId;
+            String url = "/image/version/list?productId="+productId;
             String result = new CommonRequest().sendGet(url);
             JSONObject jo = new JSONObject(new String(result));
             JSONObject jo1 =(JSONObject)jo.get("data");
@@ -173,7 +173,7 @@ public class ImageActivity extends AppCompatActivity
         versionBeanList.add(versionBean);
 
         try {
-            String url = "http://192.168.11.220:8089/image/version/add";
+            String url = "/image/version/add";
             String param = "productId="+productId+"&version="+nameEditText.getText();
             String result = new CommonRequest().sendPost(url,param);
             JSONObject jo = new JSONObject(new String(result));

@@ -1,4 +1,4 @@
-package com.asu.ota.http;
+package com.asu.ota.utils;
 
 import android.os.Environment;
 import android.util.Log;
@@ -26,8 +26,11 @@ import okio.Sink;
 
 public class CommonRequest {
 
+    private String prefix = "http://192.168.11.220:8089";
+
     //post请求
     public String sendPost(String url, String param) {
+        url = prefix + url;
         //网络请求对应的输出流，就是客户端把参数给服务器  叫输出，
         PrintWriter out = null;
         BufferedReader in = null;
@@ -76,12 +79,13 @@ public class CommonRequest {
         return result;
     }
 
-    public String  sendGet(String path)throws Exception{
+    public String sendGet(String path) throws Exception {
+        path = prefix + path;
         String responseText = "";
-        try{
+        try {
             URL url = new URL(path);
             //2. HttpURLConnection
-            HttpURLConnection conn=(HttpURLConnection)url.openConnection();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             //3. set(GET)
             conn.setRequestMethod("GET");
             //4. getInputStream
@@ -90,24 +94,25 @@ public class CommonRequest {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             StringBuilder sb = new StringBuilder();
             String line = null;
-            while((line=reader.readLine()) != null){
+            while ((line = reader.readLine()) != null) {
                 sb.append(line);
             }
             //获取响应文本
             responseText = sb.toString();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.e(path, e.getMessage());
         }
-        return  responseText;
+        return responseText;
     }
 
     //delete请求
-    public String  sendDelete(String path)throws Exception{
+    public String sendDelete(String path) throws Exception {
+        path = prefix + path;
         String responseText = "";
-        try{
+        try {
             URL url = new URL(path);
             //2. HttpURLConnection
-            HttpURLConnection conn=(HttpURLConnection)url.openConnection();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             //3. set(GET)
             conn.setRequestMethod("DELETE");
             //4. getInputStream
@@ -116,23 +121,25 @@ public class CommonRequest {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             StringBuilder sb = new StringBuilder();
             String line = null;
-            while((line=reader.readLine()) != null){
+            while ((line = reader.readLine()) != null) {
                 sb.append(line);
             }
             //获取响应文本
             responseText = sb.toString();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.e("product delete:", e.getMessage());
         }
-        return  responseText;
+        return responseText;
     }
+
     //put 请求
-    public String  sendPut(String path)throws Exception{
+    public String sendPut(String path) throws Exception {
+        path = prefix + path;
         String responseText = "";
-        try{
+        try {
             URL url = new URL(path);
             //2. HttpURLConnection
-            HttpURLConnection conn=(HttpURLConnection)url.openConnection();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             //3. set(GET)
             conn.setRequestMethod("PUT");
             //4. getInputStream
@@ -141,21 +148,22 @@ public class CommonRequest {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             StringBuilder sb = new StringBuilder();
             String line = null;
-            while((line=reader.readLine()) != null){
+            while ((line = reader.readLine()) != null) {
                 sb.append(line);
             }
             //获取响应文本
             responseText = sb.toString();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.e("product delete:", e.getMessage());
         }
-        return  responseText;
+        return responseText;
     }
 
-    public void downloadFile(String path){
+    public void downloadFile(String path) {
+        path = prefix + path;
         final String url = path;
         final long startTime = System.currentTimeMillis();
-        Log.i("DOWNLOAD","startTime="+startTime);
+        Log.i("DOWNLOAD", "startTime=" + startTime);
         OkHttpClient okHttpClient = new OkHttpClient();
 
         Request request = new Request.Builder().url(url).build();
@@ -164,8 +172,9 @@ public class CommonRequest {
             public void onFailure(Call call, IOException e) {
                 // 下载失败
                 e.printStackTrace();
-                Log.i("DOWNLOAD","download failed");
+                Log.i("DOWNLOAD", "download failed");
             }
+
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 InputStream is = null;
@@ -190,12 +199,12 @@ public class CommonRequest {
                     fos.flush();
                     // 下载完成
 //                    listener.onDownloadSuccess();
-                    Log.i("DOWNLOAD","download success");
-                    Log.i("DOWNLOAD","totalTime="+ (System.currentTimeMillis() - startTime));
+                    Log.i("DOWNLOAD", "download success");
+                    Log.i("DOWNLOAD", "totalTime=" + (System.currentTimeMillis() - startTime));
                 } catch (Exception e) {
                     e.printStackTrace();
 //                    listener.onDownloadFailed();
-                    Log.i("DOWNLOAD","download failed");
+                    Log.i("DOWNLOAD", "download failed");
                 } finally {
                     try {
                         if (is != null)
@@ -214,6 +223,7 @@ public class CommonRequest {
 
 
     public void downloadFile3(String path) {
+        path = prefix + path;
         //下载路径，如果路径无效了，可换成你的下载路径
         final String url = path;
         final long startTime = System.currentTimeMillis();
@@ -256,14 +266,15 @@ public class CommonRequest {
     }
 
     public void downloadFile1(String url) {
-        try{
+        url = prefix + url;
+        try {
             //下载路径，如果路径无效了，可换成你的下载路径
             String path = Environment.getExternalStorageDirectory().getAbsolutePath();
 
             final long startTime = System.currentTimeMillis();
-            Log.i("DOWNLOAD","startTime="+startTime);
+            Log.i("DOWNLOAD", "startTime=" + startTime);
             //下载函数
-            String filename=url.substring(url.lastIndexOf("/") + 1);
+            String filename = url.substring(url.lastIndexOf("/") + 1);
             //获取文件名
             URL myURL = new URL(url);
             URLConnection conn = myURL.openConnection();
@@ -273,18 +284,17 @@ public class CommonRequest {
             if (fileSize <= 0) throw new RuntimeException("无法获知文件大小 ");
             if (is == null) throw new RuntimeException("stream is null");
             File file1 = new File(path);
-            if(!file1.exists()){
+            if (!file1.exists()) {
                 file1.mkdirs();
             }
             //把数据存入路径+文件名
-            FileOutputStream fos = new FileOutputStream(path+"/"+filename);
+            FileOutputStream fos = new FileOutputStream(path + "/" + filename);
             byte buf[] = new byte[1024];
             int downLoadFileSize = 0;
-            do{
+            do {
                 //循环读取
                 int numread = is.read(buf);
-                if (numread == -1)
-                {
+                if (numread == -1) {
                     break;
                 }
                 fos.write(buf, 0, numread);
@@ -292,8 +302,8 @@ public class CommonRequest {
                 //更新进度条
             } while (true);
 
-            Log.i("DOWNLOAD","download success");
-            Log.i("DOWNLOAD","totalTime="+ (System.currentTimeMillis() - startTime));
+            Log.i("DOWNLOAD", "download success");
+            Log.i("DOWNLOAD", "totalTime=" + (System.currentTimeMillis() - startTime));
 
             is.close();
         } catch (Exception ex) {
@@ -302,59 +312,53 @@ public class CommonRequest {
     }
 
 
-
-    /** 获取指定网络文件url，保存至本地文件路径filePath */
-    public static void DownloadFile(final String url, final String filePath)
-    {
+    /**
+     * 获取指定网络文件url，保存至本地文件路径filePath
+     */
+    public void DownloadFile( String path, final String filePath) {
+        path = prefix + path;
         ConfirmFile(filePath);
-
-        Executors.newCachedThreadPool().execute(new Runnable()
-        {
+        final String url = path;
+        Executors.newCachedThreadPool().execute(new Runnable() {
             @Override
-            public void run()
-            {
-                try
-                {
+            public void run() {
+                try {
                     URL webUrl = new URL(url);
-                    URLConnection con = webUrl.openConnection();	// 打开连接
-                    InputStream in = con.getInputStream();			// 获取InputStream
+                    URLConnection con = webUrl.openConnection();    // 打开连接
+                    InputStream in = con.getInputStream();            // 获取InputStream
 
-                    File f = new File(filePath);					// 创建文件输出流
+                    File f = new File(filePath);                    // 创建文件输出流
                     FileOutputStream fo = new FileOutputStream(f);
 
                     byte[] buffer = new byte[1024 * 1024];
                     int len = 0;
-                    while( (len = in.read(buffer)) > 0)		// 读取文件
+                    while ((len = in.read(buffer)) > 0)        // 读取文件
                     {
-                        fo.write(buffer, 0, len); 			// 写入文件
+                        fo.write(buffer, 0, len);            // 写入文件
                     }
 
                     in.close();
 
                     fo.flush();
                     fo.close();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
     }
 
-    /** 创建目录和文件 */
-    public static void ConfirmFile(String filePath)
-    {
-        try
-        {
+    /**
+     * 创建目录和文件
+     */
+    public static void ConfirmFile(String filePath) {
+        try {
             File f = new File(filePath);
             File parent = f.getParentFile();
 
             if (!parent.exists()) parent.mkdirs();
             if (!f.exists()) f.createNewFile();
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }

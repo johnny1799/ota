@@ -22,7 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.asu.ota.R;
 import com.asu.ota.adapter.ListViewAdapter;
 import com.asu.ota.database.DatabaseHelper;
-import com.asu.ota.http.CommonRequest;
+import com.asu.ota.utils.CommonRequest;
 import com.asu.ota.model.ProductBean;
 
 import org.json.JSONArray;
@@ -99,7 +99,7 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
         //清空表数据,接口数据入库
         try{
             clearTable("Product");
-            String url = "http://192.168.11.220:8089/product/list";
+            String url = "/product/list";
             String result = new CommonRequest().sendGet(url);
             JSONObject jo = new JSONObject(new String(result));
             JSONObject jo1 =(JSONObject)jo.get("data");
@@ -171,7 +171,7 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
         productBeanList.add(productBean);
 
         try {
-            String url = "http://192.168.11.220:8089/product/add";
+            String url = "/product/add";
             String param = "name="+productBean.getName()+"&comment=";
             String result = new CommonRequest().sendPost(url,param);
             JSONObject jo = new JSONObject(new String(result));

@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.asu.ota.activity.ImageActivity;
 import com.asu.ota.activity.OtaActivity;
 import com.asu.ota.R;
-import com.asu.ota.http.CommonRequest;
+import com.asu.ota.utils.CommonRequest;
 import com.asu.ota.model.ImageBean;
 
 import org.json.JSONObject;
@@ -129,7 +129,7 @@ public class ImageListViewAdapter extends BaseAdapter{
                      dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
                 }
                 try{
-                    String url  = "http://192.168.11.220:8089/image/version/delete?id="+dbid;
+                    String url  = "/image/version/delete?id="+dbid;
                     String result = new CommonRequest().sendDelete(url);
                     JSONObject jo = new JSONObject(new String(result));
                     Integer code = (Integer)jo.get("code");
