@@ -1,10 +1,9 @@
 package com.asu.ota;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class ImageListViewAdapter extends BaseAdapter{
+public class OtaListViewAdapter extends BaseAdapter{
     /**
      * Context
      */
@@ -35,7 +34,7 @@ public class ImageListViewAdapter extends BaseAdapter{
      * @param context         context
      * @param versionBeanList versionBeanList
      */
-    public ImageListViewAdapter(Context context, List<ImageBean> versionBeanList) {
+    public OtaListViewAdapter(Context context, List<ImageBean> versionBeanList) {
         this.mContext = context;
         this.versionBeanList = versionBeanList;
     }
@@ -97,7 +96,7 @@ public class ImageListViewAdapter extends BaseAdapter{
         if (convertView != null) {
             view = convertView;
         } else {
-            view = View.inflate(mContext, R.layout.image_listview, null);
+            view = View.inflate(mContext, R.layout.ota_listview, null);
         }
 
         ImageBean versionBean = versionBeanList.get(position);
@@ -107,59 +106,23 @@ public class ImageListViewAdapter extends BaseAdapter{
 
         //更新数据
         final TextView nameTextView = (TextView) view.findViewById(R.id.showProName);
-        nameTextView.setText(versionBean.getVersion());
+        nameTextView.setText(versionBean.getPreVersion());
 
         final int removePosition = position;
-        final String name = versionBeanList.get(removePosition).getVersion();
+        final String preVersion = versionBeanList.get(removePosition).getPreVersion();
+        final String location = versionBeanList.get(removePosition).getLocation();
 
-        //删除按钮点击事件
-        Button deleteButton = (Button) view.findViewById(R.id.showImgDeleteButton);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
+        //下载按钮点击事件
+        Button downloadOtaButton = (Button) view.findViewById(R.id.showDownLoadOtaButton);
+        downloadOtaButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SQLiteDatabase db = ImageActivity.helper.getWritableDatabase();
-
-                int dbid = 0;
-                Cursor cursor = db.rawQuery("select dbid from package where version=?",new String[]{name});
-                while (cursor.moveToNext()) {
-                     dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
-                }
-                try{
-                    String url  = "http://192.168.11.220:8089/image/version/delete?id="+dbid;
-                    String result = new Utils().sendDelete(url);
-                    JSONObject jo = new JSONObject(new String(result));
-                    Integer code = (Integer)jo.get("code");
-                    if(code==0){
-                        //数据库删除
-                        db.delete("Package", "version = ? and productid = ?", new String[]{name,ImageActivity.productId+""});
-
-                        deleteButtonAction(removePosition);
-
-                        //重新加载列表
-                        ImageActivity.query(db);
-                    }
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
+                String url = "http://182.92.67.138:801/asu/upload/20190917170422162.exe";
+//                String url = "https://raw.githubusercontent.com/scimence/AndroidPlugin/master/apk/AndroidPlugin_plugin1.apk";
+                String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/backups/apps/AndroidPlugin_plugin1.apk";
+                new Utils().downloadFile(url);
             }
         });
-
-        //ota按钮点击事件
-        Button otaButton = (Button) view.findViewById(R.id.showOtaButton);
-        otaButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent =new Intent(ImageActivity.mContext,OtaActivity.class);
-                //用Bundle携带数据
-                Bundle bundle=new Bundle();
-                //传递name参数为tinyphp
-                bundle.putInt("productId", ImageActivity.productId);
-                bundle.putString("version",name);
-                intent.putExtras(bundle);
-                ImageActivity.mContext.startActivity(intent);
-            }
-        });
-
 
         return view;
     }

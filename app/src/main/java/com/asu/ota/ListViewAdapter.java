@@ -6,11 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,8 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.asu.ota.database.DatabaseHelper;
-import com.asu.ota.http.Request;
+import com.asu.ota.http.Utils;
 
 import org.json.JSONObject;
 
@@ -133,7 +130,7 @@ public class ListViewAdapter extends BaseAdapter{
                 }
                 try{
                     String url  = "http://192.168.11.220:8089/product/delete?id="+dbid;
-                    String result = new Request().sendDelete(url);
+                    String result = new Utils().sendDelete(url);
                     JSONObject jo = new JSONObject(new String(result));
                     Integer code = (Integer)jo.get("code");
                     if(code==0){
@@ -197,7 +194,7 @@ public class ListViewAdapter extends BaseAdapter{
                                                     dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
                                                 }
                                                 String url  = "http://192.168.11.220:8089/product/edit?id="+dbid+"&name="+nname+"&comment=";
-                                                String result = new Request().sendPut(url);
+                                                String result = new Utils().sendPut(url);
                                                 JSONObject jo = new JSONObject(new String(result));
                                                 Integer code = (Integer)jo.get("code");
                                                 if(code == 0){

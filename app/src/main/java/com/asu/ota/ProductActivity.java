@@ -2,14 +2,16 @@ package com.asu.ota;
 
 import java.util.ArrayList;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -21,12 +23,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.asu.ota.database.DatabaseHelper;
-import com.asu.ota.http.Request;
+import com.asu.ota.http.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class ProductActivity extends AppCompatActivity implements AdapterView.OnItemClickListener
@@ -66,6 +67,7 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.product_main);
 
@@ -98,7 +100,7 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
         try{
             clearTable("Product");
             String url = "http://192.168.11.220:8089/product/list";
-            String result = new Request().sendGet(url);
+            String result = new Utils().sendGet(url);
             JSONObject jo = new JSONObject(new String(result));
             JSONObject jo1 =(JSONObject)jo.get("data");
             JSONArray  jsonArray = (JSONArray)jo1.get("list");
@@ -171,7 +173,7 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
         try {
             String url = "http://192.168.11.220:8089/product/add";
             String param = "name="+productBean.getName()+"&comment=";
-            String result = new Request().sendPost(url,param);
+            String result = new Utils().sendPost(url,param);
             JSONObject jo = new JSONObject(new String(result));
             Integer code = (Integer)jo.get("code");
 

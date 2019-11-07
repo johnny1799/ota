@@ -2,23 +2,20 @@ package com.asu.ota;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.asu.ota.database.DatabaseHelper;
-import com.asu.ota.http.Request;
+import com.asu.ota.http.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -101,7 +98,7 @@ public class ImageActivity extends AppCompatActivity
         try{
             clearTable("Package");
             String url = "http://192.168.11.220:8089/image/version/list?productId="+productId;
-            String result = new Request().sendGet(url);
+            String result = new Utils().sendGet(url);
             JSONObject jo = new JSONObject(new String(result));
             JSONObject jo1 =(JSONObject)jo.get("data");
             JSONArray  jsonArray = (JSONArray)jo1.get("list");
@@ -175,7 +172,7 @@ public class ImageActivity extends AppCompatActivity
         try {
             String url = "http://192.168.11.220:8089/image/version/add";
             String param = "productId="+productId+"&version="+nameEditText.getText();
-            String result = new Request().sendPost(url,param);
+            String result = new Utils().sendPost(url,param);
             JSONObject jo = new JSONObject(new String(result));
             Integer code = (Integer)jo.get("code");
 
@@ -213,5 +210,4 @@ public class ImageActivity extends AppCompatActivity
         SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL(sql);
     }
-
 }

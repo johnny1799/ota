@@ -6,9 +6,15 @@ public class ImageBean
 
     private String version;
 
+    private String preVersion;
+
     private int dbid;
 
     private String desc;
+
+    private String fileName;
+
+    private String location;
 
     public ImageBean(String version)
     {
@@ -50,5 +56,29 @@ public class ImageBean
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getPreVersion() {
+        return preVersion;
+    }
+
+    public void setPreVersion(String preVersion) {
+        this.preVersion = preVersion;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }
