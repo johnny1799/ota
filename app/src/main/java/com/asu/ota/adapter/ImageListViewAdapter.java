@@ -154,12 +154,8 @@ public class ImageListViewAdapter extends BaseAdapter{
             @Override
             public void onClick(View v) {
                 Intent intent =new Intent(ImageActivity.mContext, OtaActivity.class);
-                //用Bundle携带数据
-                Bundle bundle=new Bundle();
-                //传递name参数为tinyphp
-                bundle.putInt("productId", ImageActivity.productId);
-                bundle.putString("version",name);
-                intent.putExtras(bundle);
+                intent.putExtra("productId", ImageActivity.productId);
+                intent.putExtra("version",name);
                 ImageActivity.mContext.startActivity(intent);
             }
         });
