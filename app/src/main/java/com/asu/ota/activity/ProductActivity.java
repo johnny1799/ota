@@ -223,12 +223,8 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
         }
 
         Intent intent =new Intent(ProductActivity.this,ImageActivity.class);
-
-        //用Bundle携带数据
-        Bundle bundle=new Bundle();
-        //传递name参数为tinyphp
-        bundle.putInt("productId", productId);
-        intent.putExtras(bundle);
+        intent.putExtra("productId", productId);
+        intent.putExtra("version",name);
         startActivity(intent);
 
     }
