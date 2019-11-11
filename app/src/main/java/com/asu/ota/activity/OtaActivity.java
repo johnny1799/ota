@@ -1,6 +1,7 @@
 package com.asu.ota.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.widget.ListView;
@@ -62,11 +63,11 @@ public class OtaActivity extends AppCompatActivity
         setContentView(R.layout.ota_main);
 
         //新页面接收数据
-        Bundle bundle = this.getIntent().getExtras();
+        Intent intent = getIntent();
         //产品id
-        productId = bundle.getInt("productId");
+        productId = intent.getIntExtra("productId",0);
         //版本号
-        version = bundle.getString("version");
+        version = intent.getStringExtra("version");
 
         //加载数据库
         helper = new DatabaseHelper(this);
