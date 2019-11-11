@@ -2,6 +2,7 @@ package com.asu.ota.activity;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -67,10 +68,9 @@ public class ImageActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_main);
 
-        //新页面接收数据
-        Bundle bundle = this.getIntent().getExtras();
-        //接收产品id
-        productId = bundle.getInt("productId");
+        Intent intent = getIntent();
+        //产品id
+        productId = intent.getIntExtra("productId",0);
 
         //加载数据库
         helper = new DatabaseHelper(this);
