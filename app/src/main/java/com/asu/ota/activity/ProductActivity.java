@@ -2,11 +2,13 @@ package com.asu.ota.activity;
 
 import java.util.ArrayList;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.View;
@@ -30,38 +32,36 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class ProductActivity extends AppCompatActivity implements AdapterView.OnItemClickListener
-{
+public class ProductActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     /**
      * Context
      */
     public static Context mContext;
 
-
     /**
      * listview
      */
     private static ListView listView;
+
+    public static DatabaseHelper helper;
 
     /**
      * 适配器
      */
     private static ListViewAdapter listViewAdapter;
 
+    public static Uri uri;
+    private static Cursor cursor;
+    public static ContentResolver contentResolver;
+
     /**
      * 保存数据
      */
     private static List<ProductBean> productBeanList = new ArrayList<ProductBean>();
 
-    /**
-     * 数据库操作驱动
-     */
-    public static DatabaseHelper helper;
-
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         //网络连接不能放在主线程
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -70,61 +70,57 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.product_main);
-
-        //加载数据库
         helper = new DatabaseHelper(this);
-        helper.getWritableDatabase();
+        contentResolver = getContentResolver();
+        uri = Uri.parse("content://com.asu.ota.service.ProductContentProvider");
 
         this.mContext = this;
 
         //加载listview
         listView = (ListView) findViewById(R.id.listView);
-        listViewAdapter = new ListViewAdapter(mContext,productBeanList);
+        listViewAdapter = new ListViewAdapter(mContext, productBeanList);
         listView.setAdapter(listViewAdapter);
         listView.setOnItemClickListener(this);
 
         //save button的点击事件
         Button saveButton = (Button) findViewById(R.id.id);
-        saveButton.setOnClickListener(new View.OnClickListener()
-        {
+        saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 saveProductMessage();
             }
         });
 
-        SQLiteDatabase db = helper.getReadableDatabase();
-
         //清空表数据,接口数据入库
-        try{
-            clearTable("Product");
+        try {
+            clearTable();
             String url = "/product/list";
             String result = new CommonRequest().sendGet(url);
             JSONObject jo = new JSONObject(new String(result));
-            JSONObject jo1 =(JSONObject)jo.get("data");
-            JSONArray  jsonArray = (JSONArray)jo1.get("list");
-            for(int i=0;i<jsonArray.length();i++) {
-                String id =jsonArray.getJSONObject(i).get("id")+"";
-                String name =jsonArray.getJSONObject(i).get("name")+"";
+            JSONObject jo1 = (JSONObject) jo.get("data");
+            JSONArray jsonArray = (JSONArray) jo1.get("list");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                String id = jsonArray.getJSONObject(i).get("id") + "";
+                String name = jsonArray.getJSONObject(i).get("name") + "";
                 //入库
                 ContentValues values = new ContentValues();
                 //添加第一组数据
                 values.put("name", name);
                 values.put("dbid", id);
-                db.insert("Product", null, values);
+                contentResolver.insert(uri, values);
+
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         //查询刷新数据
-        query(db);
+        query();
     }
 
 
-    public static void query(SQLiteDatabase db){
+    public static void query() {
         //查询Product表中所有的数据
-        Cursor cursor = db.query("Product", null, null, null, null, null, null);
+        cursor = contentResolver.query(uri, new String[]{"name"}, null, null, null, null);
         productBeanList.clear();
         //查询
         if (cursor.moveToFirst()) {
@@ -136,32 +132,26 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
             }
         }
         cursor.close();
-        db.close();
-        listViewAdapter = new ListViewAdapter(mContext,productBeanList);
+        listViewAdapter = new ListViewAdapter(mContext, productBeanList);
         listView.setAdapter(listViewAdapter);
     }
-
 
 
     /**
      * 保存产品的信息
      */
-    private void saveProductMessage()
-    {
+    private void saveProductMessage() {
         EditText nameEditText = (EditText) findViewById(R.id.nameEditText);
 
-        if ("".equals(nameEditText.getText().toString()))
-        {
-            Toast.makeText(mContext,"产品名不能为空",Toast.LENGTH_SHORT).show();
+        if ("".equals(nameEditText.getText().toString())) {
+            Toast.makeText(mContext, "产品名不能为空", Toast.LENGTH_SHORT).show();
             return;
         }
 
         //判断该产品是否存在
-        for (ProductBean productBean : productBeanList)
-        {
-            if (productBean.getName().equals(nameEditText.getText().toString()))
-            {
-                Toast.makeText(mContext,nameEditText.getText().toString() + "已经存在",Toast.LENGTH_SHORT).show();
+        for (ProductBean productBean : productBeanList) {
+            if (productBean.getName().equals(nameEditText.getText().toString())) {
+                Toast.makeText(mContext, nameEditText.getText().toString() + "已经存在", Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -172,38 +162,36 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
 
         try {
             String url = "/product/add";
-            String param = "name="+productBean.getName()+"&comment=";
-            String result = new CommonRequest().sendPost(url,param);
+            String param = "name=" + productBean.getName() + "&comment=";
+            String result = new CommonRequest().sendPost(url, param);
             JSONObject jo = new JSONObject(new String(result));
-            Integer code = (Integer)jo.get("code");
+            Integer code = (Integer) jo.get("code");
 
-            if(code == 0){
-                Integer dbid = (Integer)jo.get("data");
+            if (code == 0) {
+                Integer dbid = (Integer) jo.get("data");
                 //入库
-                SQLiteDatabase db = helper.getWritableDatabase();
                 ContentValues values = new ContentValues();
                 //添加第一组数据
                 values.put("name", productBean.getName());
                 values.put("dbid", dbid);
-                db.insert("Product", null, values);
+                contentResolver.insert(uri, values);
 
                 //装载数据
-                query(db);
+                query();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void clearTable(String table){
-        String sql = "DELETE FROM " + table +";";
-        SQLiteDatabase db = helper.getWritableDatabase();
-        db.execSQL(sql);
-        revertSeq(table);
+    public void clearTable() {
+        contentResolver.delete(uri, null, null);
+        revertSeq();
     }
 
-    private void revertSeq(String table) {
-        String sql = "update sqlite_sequence set seq=0 where name='"+table+"'";
+    //sequence置零
+    private void revertSeq() {
+        String sql = "update sqlite_sequence set seq=0 where name='Product'";
         SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL(sql);
     }
@@ -212,19 +200,18 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        TextView tv = (TextView)view.findViewById(R.id.showProName);
-        String name  = tv.getText()+"";
-        SQLiteDatabase db = ProductActivity.helper.getWritableDatabase();
+        TextView tv = (TextView) view.findViewById(R.id.showProName);
+        String name = tv.getText() + "";
 
         int productId = 0;
-        Cursor cursor = db.rawQuery("select dbid from product where name=?",new String[]{name});
+        cursor = contentResolver.query(uri, new String[]{"name"}, "name=?", new String[]{name}, null, null);
         while (cursor.moveToNext()) {
             productId = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
         }
 
-        Intent intent =new Intent(ProductActivity.this,ImageActivity.class);
+        Intent intent = new Intent(ProductActivity.this, ImageActivity.class);
         intent.putExtra("productId", productId);
-        intent.putExtra("version",name);
+        intent.putExtra("version", name);
         startActivity(intent);
 
     }
