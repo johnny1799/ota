@@ -26,30 +26,30 @@ public class OtaActivity extends AppCompatActivity
     /**
      * Context
      */
-    public static Context mContext;
+    public static Context sContext;
 
 
     /**
      * listview
      */
-    private static ListView listView;
+    private static ListView sListView;
 
     /**
      * 适配器
      */
-    private static OtaListViewAdapter listViewAdapter;
+    private static OtaListViewAdapter sListViewAdapter;
 
     /**
      * 保存数据
      */
-    private static List<ImageBean> versionBeanList = new ArrayList<>();
+    private static List<ImageBean> sVersionBeanList = new ArrayList<>();
 
     /**
      * 数据库操作驱动
      */
-    public static DatabaseHelper helper;
-    static int  productId=0;
-    static String  version="";
+    public static DatabaseHelper sHelper;
+    static int  sProductId=0;
+    static String  sVersion="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -65,25 +65,25 @@ public class OtaActivity extends AppCompatActivity
         //新页面接收数据
         Intent intent = getIntent();
         //产品id
-        productId = intent.getIntExtra("productId",0);
+        sProductId = intent.getIntExtra("productId",0);
         //版本号
-        version = intent.getStringExtra("version");
+        sVersion = intent.getStringExtra("version");
 
         //加载数据库
-        helper = new DatabaseHelper(this);
-        helper.getWritableDatabase();
+        sHelper = new DatabaseHelper(this);
+        sHelper.getWritableDatabase();
 
-        this.mContext = this;
+        this.sContext = this;
 
         //加载listview
-        listView = (ListView) findViewById(R.id.otaListView);
-        listViewAdapter = new OtaListViewAdapter(mContext,versionBeanList);
-        listView.setAdapter(listViewAdapter);
+        sListView = (ListView) findViewById(R.id.otaListView);
+        sListViewAdapter = new OtaListViewAdapter(sContext,sVersionBeanList);
+        sListView.setAdapter(sListViewAdapter);
 
-        versionBeanList.clear();
+        sVersionBeanList.clear();
         //清空表数据,接口数据入库
         try{
-            String url = "/image/ota/list?productId="+productId+"&version="+version;
+            String url = "/image/ota/list?productId="+sProductId+"&version="+sVersion;
             String result = new CommonRequest().sendGet(url);
             JSONObject jo = new JSONObject(new String(result));
             JSONObject jo1 =(JSONObject)jo.get("data");
@@ -100,14 +100,14 @@ public class OtaActivity extends AppCompatActivity
                 versionBean.setLocation(location);
                 versionBean.setPreVersion(preVersion);
                 versionBean.setFileName(fileName);
-                versionBeanList.add(versionBean);
+                sVersionBeanList.add(versionBean);
             }
         }catch (Exception e){
             e.printStackTrace();
         }
         //查询刷新数据
-        listViewAdapter = new OtaListViewAdapter(mContext,versionBeanList);
-        listView.setAdapter(listViewAdapter);
+        sListViewAdapter = new OtaListViewAdapter(sContext,sVersionBeanList);
+        sListView.setAdapter(sListViewAdapter);
     }
 
 }

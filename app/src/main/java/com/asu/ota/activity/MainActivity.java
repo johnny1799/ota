@@ -29,10 +29,10 @@ import org.json.JSONObject;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private TextView tv_main_title;//标题
-    private Button btn_login;//登录按钮
-    private String userName, psw;//获取的用户名，密码
-    private EditText et_user_name, et_psw;//编辑框
+    private TextView mTv_main_title;//标题
+    private Button mBtn_login;//登录按钮
+    private String mUserName, mPsw;//获取的用户名，密码
+    private EditText mEt_user_name, mEt_psw;//编辑框
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,25 +73,25 @@ public class MainActivity extends AppCompatActivity {
     //获取界面控件
     private void init() {
         //从main_title_bar中获取的id
-        tv_main_title = findViewById(R.id.tv_main_title);
-        tv_main_title.setText("登录");
-        btn_login = findViewById(R.id.btn_login);
-        et_user_name = findViewById(R.id.et_user_name);
-        et_psw = findViewById(R.id.et_psw);
+        mTv_main_title = findViewById(R.id.tv_main_title);
+        mTv_main_title.setText("登录");
+        mBtn_login = findViewById(R.id.btn_login);
+        mEt_user_name = findViewById(R.id.et_user_name);
+        mEt_psw = findViewById(R.id.et_psw);
 
         //登录按钮的点击事件
-        btn_login.setOnClickListener(new View.OnClickListener() {
+        mBtn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //开始登录，获取用户名和密码 getText().toString().trim();
-                userName = et_user_name.getText().toString().trim();
-                psw = et_psw.getText().toString().trim();
+                mUserName = mEt_user_name.getText().toString().trim();
+                mPsw = mEt_psw.getText().toString().trim();
 
                 // TextUtils.isEmpty
-                if (TextUtils.isEmpty(userName)) {
+                if (TextUtils.isEmpty(mUserName)) {
                     Toast.makeText(MainActivity.this, "请输入用户名", Toast.LENGTH_SHORT).show();
                     return;
-                } else if (TextUtils.isEmpty(psw)) {
+                } else if (TextUtils.isEmpty(mPsw)) {
                     Toast.makeText(MainActivity.this, "请输入密码", Toast.LENGTH_SHORT).show();
                     return;
                 } else {
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                         if(NetWorkUtil.isNetAvailable(MainActivity.this)){//网络畅通
                             //开始请求数据
                             String url = "/home/login";
-                            String param = "username=" + userName + "&password=" + psw;
+                            String param = "username=" + mUserName + "&password=" + mPsw;
                             String result = new CommonRequest().sendPost(url, param);
                             JSONObject jo = new JSONObject(new String(result));
                             Integer code = (Integer) jo.get("code");

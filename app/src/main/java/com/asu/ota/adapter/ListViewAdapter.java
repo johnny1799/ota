@@ -126,7 +126,7 @@ public class ListViewAdapter extends BaseAdapter{
             public void onClick(View v) {
 
                 int dbid = 0;
-                Cursor cursor = ProductActivity.contentResolver.query(ProductActivity.uri, new String[]{"dbid"}, "name=?", new String[]{name}, null, null);
+                Cursor cursor = ProductActivity.sContentResolver.query(ProductActivity.sUri, new String[]{"dbid"}, "name=?", new String[]{name}, null, null);
                 while (cursor.moveToNext()) {
                      dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
                 }
@@ -139,7 +139,7 @@ public class ListViewAdapter extends BaseAdapter{
                         Integer code = (Integer)jo.get("code");
                         if(code==0){
                             //数据库删除
-                            ProductActivity.contentResolver.delete(ProductActivity.uri,"name = ?",new String[]{name});
+                            ProductActivity.sContentResolver.delete(ProductActivity.sUri,"name = ?",new String[]{name});
                             deleteButtonAction(removePosition);
 
                             //重新加载列表
@@ -196,7 +196,7 @@ public class ListViewAdapter extends BaseAdapter{
                                                 //判断网路是否畅通加权限
                                                 if(NetWorkUtil.isNetAvailable(mContext)){//网络畅通
                                                     int dbid = 0;
-                                                    Cursor cursor = ProductActivity.contentResolver.query(ProductActivity.uri, new String[]{"dbid"}, "name=?", new String[]{name}, null, null);
+                                                    Cursor cursor = ProductActivity.sContentResolver.query(ProductActivity.sUri, new String[]{"dbid"}, "name=?", new String[]{name}, null, null);
                                                     while (cursor.moveToNext()) {
                                                         dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
                                                     }
@@ -207,7 +207,7 @@ public class ListViewAdapter extends BaseAdapter{
                                                     if(code == 0){
                                                         ContentValues values = new ContentValues();
                                                         values.put("name",nname);
-                                                        ProductActivity.contentResolver.update(ProductActivity.uri, values, "name = ?", new String[]{name});
+                                                        ProductActivity.sContentResolver.update(ProductActivity.sUri, values, "name = ?", new String[]{name});
                                                         //重新加载列表
                                                         ProductActivity.query();
 

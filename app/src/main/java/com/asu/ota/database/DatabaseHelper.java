@@ -7,12 +7,12 @@ import android.widget.Toast;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final String DB_NAME = "asu";
-    private static final int DB_VERSION = 2;
-    private Context context;
-    private static DatabaseHelper instance;
+    private static final String sDB_NAME = "asu";
+    private static final int sDB_VERSION = 2;
+    private Context mContext;
+    private static DatabaseHelper sInstance;
 
-    private static final String CREATE_PRODUCT = "create table Product ("
+    private static final String sCREATE_PRODUCT = "create table Product ("
             + "id integer primary key autoincrement, "
             + "name text,"
             + "dbid integer"
@@ -36,22 +36,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return
      */
     public static synchronized DatabaseHelper getInstance(Context context) {
-        if (instance == null) {
-            instance = new DatabaseHelper(context);
+        if (sInstance == null) {
+            sInstance = new DatabaseHelper(context);
         }
-        return instance;
+        return sInstance;
     }
 
     public DatabaseHelper(Context context) {
-        super(context,DB_NAME, null, DB_VERSION);
-        this.context = context;
+        super(context,sDB_NAME, null, sDB_VERSION);
+        this.mContext = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_PRODUCT);
+        db.execSQL(sCREATE_PRODUCT);
         db.execSQL(CREATE_PACKAGE);
-        Toast.makeText(context,"create succcess",Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext,"create succcess",Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -70,7 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         switch (newVersion) {
             case 1:
-                db.execSQL(CREATE_PRODUCT);
+                db.execSQL(sCREATE_PRODUCT);
                 db.execSQL(CREATE_OTA);
                 break;
 
@@ -78,7 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.execSQL(CREATE_OTA);
 
                 db.rawQuery("select * from Category",null);
-                Toast.makeText(context,"create succcess01",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext,"create succcess01",Toast.LENGTH_SHORT).show();
             default:
         }
     }

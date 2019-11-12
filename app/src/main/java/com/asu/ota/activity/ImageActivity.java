@@ -33,29 +33,29 @@ public class ImageActivity extends AppCompatActivity
     /**
      * Context
      */
-    public static Context mContext;
+    public static Context sContext;
 
 
     /**
      * listview
      */
-    private static ListView listView;
+    private static ListView sListView;
 
     /**
      * 适配器
      */
-    private static ImageListViewAdapter listViewAdapter;
+    private static ImageListViewAdapter sListViewAdapter;
 
     /**
      * 保存数据
      */
-    private static List<ImageBean> versionBeanList = new ArrayList<>();
+    private static List<ImageBean> sVersionBeanList = new ArrayList<>();
 
     /**
      * 数据库操作驱动
      */
-    public static DatabaseHelper helper;
-    public static int  productId=0;
+    public static DatabaseHelper sHelper;
+    public static int  sProductId=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -70,18 +70,18 @@ public class ImageActivity extends AppCompatActivity
 
         Intent intent = getIntent();
         //产品id
-        productId = intent.getIntExtra("productId",0);
+        sProductId = intent.getIntExtra("productId",0);
 
         //加载数据库
-        helper = new DatabaseHelper(this);
-        helper.getWritableDatabase();
+        sHelper = new DatabaseHelper(this);
+        sHelper.getWritableDatabase();
 
-        this.mContext = this;
+        this.sContext = this;
 
         //加载listview
-        listView = (ListView) findViewById(R.id.imageListView);
-        listViewAdapter = new ImageListViewAdapter(mContext,versionBeanList);
-        listView.setAdapter(listViewAdapter);
+        sListView = (ListView) findViewById(R.id.imageListView);
+        sListViewAdapter = new ImageListViewAdapter(sContext,sVersionBeanList);
+        sListView.setAdapter(sListViewAdapter);
 //        listView.setOnItemClickListener(this);
 
         //save button的点击事件
@@ -95,12 +95,12 @@ public class ImageActivity extends AppCompatActivity
             }
         });
 
-        SQLiteDatabase db = helper.getReadableDatabase();
+        SQLiteDatabase db = sHelper.getReadableDatabase();
 
         //清空表数据,接口数据入库
         try{
             clearTable("Package");
-            String url = "/image/version/list?productId="+productId;
+            String url = "/image/version/list?productId="+sProductId;
             String result = new CommonRequest().sendGet(url);
             JSONObject jo = new JSONObject(new String(result));
             JSONObject jo1 =(JSONObject)jo.get("data");
@@ -113,7 +113,7 @@ public class ImageActivity extends AppCompatActivity
                 //添加第一组数据
                 values.put("version", version);
                 values.put("dbid", id);
-                values.put("productid", productId);
+                values.put("productid", sProductId);
                 db.insert("Package", null, values);
             }
         }catch (Exception e){
@@ -126,21 +126,21 @@ public class ImageActivity extends AppCompatActivity
 
     public static void query(SQLiteDatabase db){
         //查询Package表中所有的数据
-        Cursor cursor = db.rawQuery("select dbid,version from package where productid=?",new String[]{productId+""});
-        versionBeanList.clear();
+        Cursor cursor = db.rawQuery("select dbid,version from package where productid=?",new String[]{sProductId+""});
+        sVersionBeanList.clear();
         //查询
         if (cursor.moveToFirst()) {
             while (cursor.moveToNext()) {
                 String version = cursor.getString(cursor.getColumnIndex("version"));
                 ImageBean versionBean = new ImageBean();
                 versionBean.setVersion(version);
-                versionBeanList.add(versionBean);
+                sVersionBeanList.add(versionBean);
             }
         }
         cursor.close();
         db.close();
-        listViewAdapter = new ImageListViewAdapter(mContext,versionBeanList);
-        listView.setAdapter(listViewAdapter);
+        sListViewAdapter = new ImageListViewAdapter(sContext,sVersionBeanList);
+        sListView.setAdapter(sListViewAdapter);
     }
 
 
@@ -154,27 +154,27 @@ public class ImageActivity extends AppCompatActivity
 
         if ("".equals(nameEditText.getText().toString()))
         {
-            Toast.makeText(mContext,"版本名不能为空",Toast.LENGTH_SHORT).show();
+            Toast.makeText(sContext,"版本名不能为空",Toast.LENGTH_SHORT).show();
             return;
         }
 
         //判断该产品是否存在
-        for (ImageBean versionBean : versionBeanList)
+        for (ImageBean versionBean : sVersionBeanList)
         {
             if (versionBean.getVersion().equals(nameEditText.getText().toString()))
             {
-                Toast.makeText(mContext,nameEditText.getText().toString() + "已经存在",Toast.LENGTH_SHORT).show();
+                Toast.makeText(sContext,nameEditText.getText().toString() + "已经存在",Toast.LENGTH_SHORT).show();
                 return;
             }
         }
 
 
         ImageBean versionBean = new ImageBean(nameEditText.getText().toString());
-        versionBeanList.add(versionBean);
+        sVersionBeanList.add(versionBean);
 
         try {
             String url = "/image/version/add";
-            String param = "productId="+productId+"&version="+nameEditText.getText();
+            String param = "productId="+sProductId+"&version="+nameEditText.getText();
             String result = new CommonRequest().sendPost(url,param);
             JSONObject jo = new JSONObject(new String(result));
             Integer code = (Integer)jo.get("code");
@@ -182,19 +182,19 @@ public class ImageActivity extends AppCompatActivity
             if(code == 0){
                 Integer dbid = (Integer)jo.get("data");
                 //入库
-                SQLiteDatabase db = helper.getWritableDatabase();
+                SQLiteDatabase db = sHelper.getWritableDatabase();
                 ContentValues values = new ContentValues();
                 //添加第一组数据
                 values.put("version", versionBean.getVersion());
                 values.put("dbid", dbid);
-                values.put("productid", productId);
+                values.put("productid", sProductId);
                 db.insert("Package", null, values);
 
                 //装载数据
                 query(db);
             }else{
                 String msg = (String)jo.get("msg");
-                Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
+                Toast.makeText(sContext, msg, Toast.LENGTH_SHORT).show();
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -203,14 +203,14 @@ public class ImageActivity extends AppCompatActivity
 
     public void clearTable(String table){
         String sql = "DELETE FROM " + table +";";
-        SQLiteDatabase db = helper.getWritableDatabase();
+        SQLiteDatabase db = sHelper.getWritableDatabase();
         db.execSQL(sql);
         revertSeq(table);
     }
 
     private void revertSeq(String table) {
         String sql = "update sqlite_sequence set seq=0 where name='"+table+"'";
-        SQLiteDatabase db = helper.getWritableDatabase();
+        SQLiteDatabase db = sHelper.getWritableDatabase();
         db.execSQL(sql);
     }
 }

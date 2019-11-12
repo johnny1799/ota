@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -121,7 +120,7 @@ public class ImageListViewAdapter extends BaseAdapter{
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SQLiteDatabase db = ImageActivity.helper.getWritableDatabase();
+                SQLiteDatabase db = ImageActivity.sHelper.getWritableDatabase();
 
                 int dbid = 0;
                 Cursor cursor = db.rawQuery("select dbid from package where version=?",new String[]{name});
@@ -135,7 +134,7 @@ public class ImageListViewAdapter extends BaseAdapter{
                     Integer code = (Integer)jo.get("code");
                     if(code==0){
                         //数据库删除
-                        db.delete("Package", "version = ? and productid = ?", new String[]{name,ImageActivity.productId+""});
+                        db.delete("Package", "version = ? and productid = ?", new String[]{name,ImageActivity.sProductId+""});
 
                         deleteButtonAction(removePosition);
 
@@ -153,10 +152,10 @@ public class ImageListViewAdapter extends BaseAdapter{
         otaButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent =new Intent(ImageActivity.mContext, OtaActivity.class);
-                intent.putExtra("productId", ImageActivity.productId);
+                Intent intent =new Intent(ImageActivity.sContext, OtaActivity.class);
+                intent.putExtra("productId", ImageActivity.sProductId);
                 intent.putExtra("version",name);
-                ImageActivity.mContext.startActivity(intent);
+                ImageActivity.sContext.startActivity(intent);
             }
         });
 

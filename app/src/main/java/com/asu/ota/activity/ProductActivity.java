@@ -38,23 +38,23 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
     /**
      * Context
      */
-    public static Context mContext;
+    public static Context sContext;
 
     /**
      * listview
      */
-    private static ListView listView;
+    private static ListView sListView;
 
-    public static DatabaseHelper helper;
+    public static DatabaseHelper sHelper;
 
     /**
      * 适配器
      */
-    private static ListViewAdapter listViewAdapter;
+    private static ListViewAdapter sListViewAdapter;
 
-    public static Uri uri;
-    private static Cursor cursor;
-    public static ContentResolver contentResolver;
+    public static Uri sUri;
+    private static Cursor sCursor;
+    public static ContentResolver sContentResolver;
 
     /**
      * 保存数据
@@ -71,17 +71,17 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.product_main);
-        helper = new DatabaseHelper(this);
-        contentResolver = getContentResolver();
-        uri = Uri.parse("content://com.asu.ota.service.ProductContentProvider");
+        sHelper = new DatabaseHelper(this);
+        sContentResolver = getContentResolver();
+        sUri = Uri.parse("content://com.asu.ota.service.ProductContentProvider");
 
-        this.mContext = this;
+        this.sContext = this;
 
         //加载listview
-        listView = (ListView) findViewById(R.id.listView);
-        listViewAdapter = new ListViewAdapter(mContext, productBeanList);
-        listView.setAdapter(listViewAdapter);
-        listView.setOnItemClickListener(this);
+        sListView = (ListView) findViewById(R.id.listView);
+        sListViewAdapter = new ListViewAdapter(sContext, productBeanList);
+        sListView.setAdapter(sListViewAdapter);
+        sListView.setOnItemClickListener(this);
 
         //save button的点击事件
         Button saveButton = (Button) findViewById(R.id.id);
@@ -95,7 +95,7 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
         //清空表数据,接口数据入库
         try {
             //判断网路是否畅通加权限
-            if(NetWorkUtil.isNetAvailable(mContext)){//网络畅通
+            if(NetWorkUtil.isNetAvailable(sContext)){//网络畅通
                 //开始请求数据
                 clearTable();
                 String url = "/product/list";
@@ -111,11 +111,11 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
                     //添加第一组数据
                     values.put("name", name);
                     values.put("dbid", id);
-                    contentResolver.insert(uri, values);
+                    sContentResolver.insert(sUri, values);
 
                 }
             }else{
-                Toast.makeText(mContext, "目前没网请检查网络权限", Toast.LENGTH_SHORT).show();
+                Toast.makeText(sContext, "目前没网请检查网络权限", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -127,24 +127,24 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
 
     public static void query() {
         //判断网路是否畅通加权限
-        if(NetWorkUtil.isNetAvailable(mContext)){//网络畅通
+        if(NetWorkUtil.isNetAvailable(sContext)){//网络畅通
             //查询Product表中所有的数据
-            cursor = contentResolver.query(uri, new String[]{"name"}, null, null, null, null);
+            sCursor = sContentResolver.query(sUri, new String[]{"name"}, null, null, null, null);
             productBeanList.clear();
             //查询
-            if (cursor.moveToFirst()) {
-                while (cursor.moveToNext()) {
-                    String name = cursor.getString(cursor.getColumnIndex("name"));
+            if (sCursor.moveToFirst()) {
+                while (sCursor.moveToNext()) {
+                    String name = sCursor.getString(sCursor.getColumnIndex("name"));
                     ProductBean productBean = new ProductBean();
                     productBean.setName(name);
                     productBeanList.add(productBean);
                 }
             }
-            cursor.close();
-            listViewAdapter = new ListViewAdapter(mContext, productBeanList);
-            listView.setAdapter(listViewAdapter);
+            sCursor.close();
+            sListViewAdapter = new ListViewAdapter(sContext, productBeanList);
+            sListView.setAdapter(sListViewAdapter);
         }else{
-            Toast.makeText(mContext, "目前没网请检查网络权限", Toast.LENGTH_SHORT).show();
+            Toast.makeText(sContext, "目前没网请检查网络权限", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -156,14 +156,14 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
         EditText nameEditText = (EditText) findViewById(R.id.nameEditText);
 
         if ("".equals(nameEditText.getText().toString())) {
-            Toast.makeText(mContext, "产品名不能为空", Toast.LENGTH_SHORT).show();
+            Toast.makeText(sContext, "产品名不能为空", Toast.LENGTH_SHORT).show();
             return;
         }
 
         //判断该产品是否存在
         for (ProductBean productBean : productBeanList) {
             if (productBean.getName().equals(nameEditText.getText().toString())) {
-                Toast.makeText(mContext, nameEditText.getText().toString() + "已经存在", Toast.LENGTH_SHORT).show();
+                Toast.makeText(sContext, nameEditText.getText().toString() + "已经存在", Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -174,7 +174,7 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
 
         try {
             //判断网路是否畅通加权限
-            if(NetWorkUtil.isNetAvailable(mContext)){//网络畅通
+            if(NetWorkUtil.isNetAvailable(sContext)){//网络畅通
                 //开始请求数据
                 String url = "/product/add";
                 String param = "name=" + productBean.getName() + "&comment=";
@@ -189,13 +189,13 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
                     //添加第一组数据
                     values.put("name", productBean.getName());
                     values.put("dbid", dbid);
-                    contentResolver.insert(uri, values);
+                    sContentResolver.insert(sUri, values);
 
                     //装载数据
                     query();
                 }
             }else{
-                Toast.makeText(mContext, "目前没网请检查网络权限", 0).show();
+                Toast.makeText(sContext, "目前没网请检查网络权限", 0).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -203,14 +203,14 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
     }
 
     public void clearTable() {
-        contentResolver.delete(uri, null, null);
+        sContentResolver.delete(sUri, null, null);
         revertSeq();
     }
 
     //sequence置零
     private void revertSeq() {
         String sql = "update sqlite_sequence set seq=0 where name='Product'";
-        SQLiteDatabase db = helper.getWritableDatabase();
+        SQLiteDatabase db = sHelper.getWritableDatabase();
         db.execSQL(sql);
     }
 
@@ -218,14 +218,14 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         //判断网路是否畅通加权限
-        if(NetWorkUtil.isNetAvailable(mContext)){//网络畅通
+        if(NetWorkUtil.isNetAvailable(sContext)){//网络畅通
             TextView tv = (TextView) view.findViewById(R.id.showProName);
             String name = tv.getText() + "";
 
             int productId = 0;
-            cursor = contentResolver.query(uri, new String[]{"name"}, "name=?", new String[]{name}, null, null);
-            while (cursor.moveToNext()) {
-                productId = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
+            sCursor = sContentResolver.query(sUri, new String[]{"name"}, "name=?", new String[]{name}, null, null);
+            while (sCursor.moveToNext()) {
+                productId = sCursor.getInt(0); //获取第一列的值,第一列的索引从0开始
             }
 
             Intent intent = new Intent(ProductActivity.this, ImageActivity.class);
@@ -233,7 +233,7 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
             intent.putExtra("version", name);
             startActivity(intent);
         }else{
-            Toast.makeText(mContext, "目前没网请检查网络权限", 0).show();
+            Toast.makeText(sContext, "目前没网请检查网络权限", Toast.LENGTH_SHORT).show();
         }
     }
 }
