@@ -40,6 +40,13 @@
             android:label="差分包"
             android:theme="@style/AppTheme">
         </activity>
+
+        <provider
+            android:authorities="com.asu.ota.service.ProductContentProvider"
+            android:name=".service.ProductContentProvider"
+            android:enabled="true"
+            android:exported="true"/>
     </application>
+
 
 </manifest>
