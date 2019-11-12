@@ -19,6 +19,7 @@ import com.asu.ota.activity.ProductActivity;
 import com.asu.ota.R;
 import com.asu.ota.utils.CommonRequest;
 import com.asu.ota.model.ProductBean;
+import com.asu.ota.utils.NetWorkUtil;
 
 import org.json.JSONObject;
 
@@ -130,17 +131,22 @@ public class ListViewAdapter extends BaseAdapter{
                      dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
                 }
                 try{
-                    String url  = "/product/delete?id="+dbid;
-                    String result = new CommonRequest().sendDelete(url);
-                    JSONObject jo = new JSONObject(new String(result));
-                    Integer code = (Integer)jo.get("code");
-                    if(code==0){
-                        //数据库删除
-                        ProductActivity.contentResolver.delete(ProductActivity.uri,"name = ?",new String[]{name});
-                        deleteButtonAction(removePosition);
+                    //判断网路是否畅通加权限
+                    if(NetWorkUtil.isNetAvailable(mContext)){//网络畅通
+                        String url  = "/product/delete?id="+dbid;
+                        String result = new CommonRequest().sendDelete(url);
+                        JSONObject jo = new JSONObject(new String(result));
+                        Integer code = (Integer)jo.get("code");
+                        if(code==0){
+                            //数据库删除
+                            ProductActivity.contentResolver.delete(ProductActivity.uri,"name = ?",new String[]{name});
+                            deleteButtonAction(removePosition);
 
-                        //重新加载列表
-                        ProductActivity.query();
+                            //重新加载列表
+                            ProductActivity.query();
+                        }
+                    }else{
+                        Toast.makeText(mContext, "目前没网请检查网络权限", Toast.LENGTH_SHORT).show();
                     }
                 }catch(Exception e){
                     e.printStackTrace();
@@ -187,26 +193,31 @@ public class ListViewAdapter extends BaseAdapter{
                                                     .show();
                                         } else {
                                             try{
-                                                int dbid = 0;
-                                                Cursor cursor = ProductActivity.contentResolver.query(ProductActivity.uri, new String[]{"dbid"}, "name=?", new String[]{name}, null, null);
-                                                while (cursor.moveToNext()) {
-                                                    dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
-                                                }
-                                                String url  = "/product/edit?id="+dbid+"&name="+nname+"&comment=";
-                                                String result = new CommonRequest().sendPut(url);
-                                                JSONObject jo = new JSONObject(new String(result));
-                                                Integer code = (Integer)jo.get("code");
-                                                if(code == 0){
-                                                    ContentValues values = new ContentValues();
-                                                    values.put("name",nname);
-                                                    ProductActivity.contentResolver.update(ProductActivity.uri, values, "name = ?", new String[]{name});
-                                                    //重新加载列表
-                                                    ProductActivity.query();
+                                                //判断网路是否畅通加权限
+                                                if(NetWorkUtil.isNetAvailable(mContext)){//网络畅通
+                                                    int dbid = 0;
+                                                    Cursor cursor = ProductActivity.contentResolver.query(ProductActivity.uri, new String[]{"dbid"}, "name=?", new String[]{name}, null, null);
+                                                    while (cursor.moveToNext()) {
+                                                        dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
+                                                    }
+                                                    String url  = "/product/edit?id="+dbid+"&name="+nname+"&comment=";
+                                                    String result = new CommonRequest().sendPut(url);
+                                                    JSONObject jo = new JSONObject(new String(result));
+                                                    Integer code = (Integer)jo.get("code");
+                                                    if(code == 0){
+                                                        ContentValues values = new ContentValues();
+                                                        values.put("name",nname);
+                                                        ProductActivity.contentResolver.update(ProductActivity.uri, values, "name = ?", new String[]{name});
+                                                        //重新加载列表
+                                                        ProductActivity.query();
 
-                                                    Toast.makeText(
-                                                            mContext,
-                                                            "数据修改为:" + nname + "",
-                                                            Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(
+                                                                mContext,
+                                                                "数据修改为:" + nname + "",
+                                                                Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }else{
+                                                    Toast.makeText(mContext, "目前没网请检查网络权限", Toast.LENGTH_SHORT).show();
                                                 }
                                             }catch (Exception e){
                                                 e.printStackTrace();

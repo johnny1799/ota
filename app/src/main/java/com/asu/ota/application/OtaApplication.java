@@ -20,6 +20,7 @@ import androidx.core.app.ActivityCompat;
 import com.asu.ota.R;
 import com.asu.ota.activity.ProductActivity;
 import com.asu.ota.utils.CommonRequest;
+import com.asu.ota.utils.NetWorkUtil;
 import com.idescout.sql.SqlScoutServer;
 
 import org.json.JSONObject;
@@ -96,26 +97,32 @@ public class OtaApplication extends AppCompatActivity {
                     return;
                 } else {
                     try {
-                        String url = "/home/login";
-                        String param = "username=" + userName + "&password=" + psw;
-                        String result = new CommonRequest().sendPost(url, param);
-                        JSONObject jo = new JSONObject(new String(result));
-                        Integer code = (Integer) jo.get("code");
-                        if (code == 0) {
-                            //一致登录成功
-                            Toast.makeText(OtaApplication.this, "登录成功", Toast.LENGTH_SHORT).show();
-                            //登录成功后关闭此页面进入主页
-                            Intent data = new Intent();
-                            //datad.putExtra( ); name , value ;
-                            data.putExtra("isLogin", true);
-                            //RESULT_OK为Activity系统常量，状态码为-1
-                            // 表示此页面下的内容操作成功将data返回到上一页面，如果是用back返回过去的则不存在用setResult传递data值
-                            setResult(RESULT_OK, data);
-                            //跳转到主界面，登录成功的状态传递到 OtaApplication 中
-                            startActivity(new Intent(OtaApplication.this, ProductActivity.class));
-                            return;
-                        } else {
-                            Toast.makeText(OtaApplication.this, "账户或密码错误", Toast.LENGTH_SHORT).show();
+                        //判断网路是否畅通加权限
+                        if(NetWorkUtil.isNetAvailable(OtaApplication.this)){//网络畅通
+                            //开始请求数据
+                            String url = "/home/login";
+                            String param = "username=" + userName + "&password=" + psw;
+                            String result = new CommonRequest().sendPost(url, param);
+                            JSONObject jo = new JSONObject(new String(result));
+                            Integer code = (Integer) jo.get("code");
+                            if (code == 0) {
+                                //一致登录成功
+                                Toast.makeText(OtaApplication.this, "登录成功", Toast.LENGTH_SHORT).show();
+                                //登录成功后关闭此页面进入主页
+                                Intent data = new Intent();
+                                //datad.putExtra( ); name , value ;
+                                data.putExtra("isLogin", true);
+                                //RESULT_OK为Activity系统常量，状态码为-1
+                                // 表示此页面下的内容操作成功将data返回到上一页面，如果是用back返回过去的则不存在用setResult传递data值
+                                setResult(RESULT_OK, data);
+                                //跳转到主界面，登录成功的状态传递到 OtaApplication 中
+                                startActivity(new Intent(OtaApplication.this, ProductActivity.class));
+                                return;
+                            } else {
+                                Toast.makeText(OtaApplication.this, "账户或密码错误", Toast.LENGTH_SHORT).show();
+                            }
+                        }else{
+                            Toast.makeText(OtaApplication.this, "目前没网请检查网络权限", Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
                         Log.e("login", e.getMessage());

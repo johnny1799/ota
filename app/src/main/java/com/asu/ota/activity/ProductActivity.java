@@ -26,6 +26,7 @@ import com.asu.ota.adapter.ListViewAdapter;
 import com.asu.ota.database.DatabaseHelper;
 import com.asu.ota.utils.CommonRequest;
 import com.asu.ota.model.ProductBean;
+import com.asu.ota.utils.NetWorkUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -93,22 +94,28 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
 
         //清空表数据,接口数据入库
         try {
-            clearTable();
-            String url = "/product/list";
-            String result = new CommonRequest().sendGet(url);
-            JSONObject jo = new JSONObject(new String(result));
-            JSONObject jo1 = (JSONObject) jo.get("data");
-            JSONArray jsonArray = (JSONArray) jo1.get("list");
-            for (int i = 0; i < jsonArray.length(); i++) {
-                String id = jsonArray.getJSONObject(i).get("id") + "";
-                String name = jsonArray.getJSONObject(i).get("name") + "";
-                //入库
-                ContentValues values = new ContentValues();
-                //添加第一组数据
-                values.put("name", name);
-                values.put("dbid", id);
-                contentResolver.insert(uri, values);
+            //判断网路是否畅通加权限
+            if(NetWorkUtil.isNetAvailable(mContext)){//网络畅通
+                //开始请求数据
+                clearTable();
+                String url = "/product/list";
+                String result = new CommonRequest().sendGet(url);
+                JSONObject jo = new JSONObject(new String(result));
+                JSONObject jo1 = (JSONObject) jo.get("data");
+                JSONArray jsonArray = (JSONArray) jo1.get("list");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String id = jsonArray.getJSONObject(i).get("id") + "";
+                    String name = jsonArray.getJSONObject(i).get("name") + "";
+                    //入库
+                    ContentValues values = new ContentValues();
+                    //添加第一组数据
+                    values.put("name", name);
+                    values.put("dbid", id);
+                    contentResolver.insert(uri, values);
 
+                }
+            }else{
+                Toast.makeText(mContext, "目前没网请检查网络权限", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -119,21 +126,26 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
 
 
     public static void query() {
-        //查询Product表中所有的数据
-        cursor = contentResolver.query(uri, new String[]{"name"}, null, null, null, null);
-        productBeanList.clear();
-        //查询
-        if (cursor.moveToFirst()) {
-            while (cursor.moveToNext()) {
-                String name = cursor.getString(cursor.getColumnIndex("name"));
-                ProductBean productBean = new ProductBean();
-                productBean.setName(name);
-                productBeanList.add(productBean);
+        //判断网路是否畅通加权限
+        if(NetWorkUtil.isNetAvailable(mContext)){//网络畅通
+            //查询Product表中所有的数据
+            cursor = contentResolver.query(uri, new String[]{"name"}, null, null, null, null);
+            productBeanList.clear();
+            //查询
+            if (cursor.moveToFirst()) {
+                while (cursor.moveToNext()) {
+                    String name = cursor.getString(cursor.getColumnIndex("name"));
+                    ProductBean productBean = new ProductBean();
+                    productBean.setName(name);
+                    productBeanList.add(productBean);
+                }
             }
+            cursor.close();
+            listViewAdapter = new ListViewAdapter(mContext, productBeanList);
+            listView.setAdapter(listViewAdapter);
+        }else{
+            Toast.makeText(mContext, "目前没网请检查网络权限", Toast.LENGTH_SHORT).show();
         }
-        cursor.close();
-        listViewAdapter = new ListViewAdapter(mContext, productBeanList);
-        listView.setAdapter(listViewAdapter);
     }
 
 
@@ -161,23 +173,29 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
         productBeanList.add(productBean);
 
         try {
-            String url = "/product/add";
-            String param = "name=" + productBean.getName() + "&comment=";
-            String result = new CommonRequest().sendPost(url, param);
-            JSONObject jo = new JSONObject(new String(result));
-            Integer code = (Integer) jo.get("code");
+            //判断网路是否畅通加权限
+            if(NetWorkUtil.isNetAvailable(mContext)){//网络畅通
+                //开始请求数据
+                String url = "/product/add";
+                String param = "name=" + productBean.getName() + "&comment=";
+                String result = new CommonRequest().sendPost(url, param);
+                JSONObject jo = new JSONObject(new String(result));
+                Integer code = (Integer) jo.get("code");
 
-            if (code == 0) {
-                Integer dbid = (Integer) jo.get("data");
-                //入库
-                ContentValues values = new ContentValues();
-                //添加第一组数据
-                values.put("name", productBean.getName());
-                values.put("dbid", dbid);
-                contentResolver.insert(uri, values);
+                if (code == 0) {
+                    Integer dbid = (Integer) jo.get("data");
+                    //入库
+                    ContentValues values = new ContentValues();
+                    //添加第一组数据
+                    values.put("name", productBean.getName());
+                    values.put("dbid", dbid);
+                    contentResolver.insert(uri, values);
 
-                //装载数据
-                query();
+                    //装载数据
+                    query();
+                }
+            }else{
+                Toast.makeText(mContext, "目前没网请检查网络权限", 0).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -199,20 +217,23 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        //判断网路是否畅通加权限
+        if(NetWorkUtil.isNetAvailable(mContext)){//网络畅通
+            TextView tv = (TextView) view.findViewById(R.id.showProName);
+            String name = tv.getText() + "";
 
-        TextView tv = (TextView) view.findViewById(R.id.showProName);
-        String name = tv.getText() + "";
+            int productId = 0;
+            cursor = contentResolver.query(uri, new String[]{"name"}, "name=?", new String[]{name}, null, null);
+            while (cursor.moveToNext()) {
+                productId = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
+            }
 
-        int productId = 0;
-        cursor = contentResolver.query(uri, new String[]{"name"}, "name=?", new String[]{name}, null, null);
-        while (cursor.moveToNext()) {
-            productId = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
+            Intent intent = new Intent(ProductActivity.this, ImageActivity.class);
+            intent.putExtra("productId", productId);
+            intent.putExtra("version", name);
+            startActivity(intent);
+        }else{
+            Toast.makeText(mContext, "目前没网请检查网络权限", 0).show();
         }
-
-        Intent intent = new Intent(ProductActivity.this, ImageActivity.class);
-        intent.putExtra("productId", productId);
-        intent.putExtra("version", name);
-        startActivity(intent);
-
     }
 }
