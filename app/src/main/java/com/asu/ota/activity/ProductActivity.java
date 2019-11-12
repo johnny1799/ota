@@ -195,7 +195,7 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
                     query();
                 }
             }else{
-                Toast.makeText(sContext, "目前没网请检查网络权限", 0).show();
+                Toast.makeText(sContext, "目前没网请检查网络权限", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -223,11 +223,12 @@ public class ProductActivity extends AppCompatActivity implements AdapterView.On
             String name = tv.getText() + "";
 
             int productId = 0;
-            sCursor = sContentResolver.query(sUri, new String[]{"name"}, "name=?", new String[]{name}, null, null);
+            sCursor = sContentResolver.query(sUri, new String[]{"dbid"}, "name=?", new String[]{name}, null, null);
             while (sCursor.moveToNext()) {
                 productId = sCursor.getInt(0); //获取第一列的值,第一列的索引从0开始
             }
 
+            sCursor.close();
             Intent intent = new Intent(ProductActivity.this, ImageActivity.class);
             intent.putExtra("productId", productId);
             intent.putExtra("version", name);

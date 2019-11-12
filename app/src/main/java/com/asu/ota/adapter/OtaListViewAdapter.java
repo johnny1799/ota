@@ -24,7 +24,7 @@ public class OtaListViewAdapter extends BaseAdapter{
     /**
      * 数据
      */
-    private List<ImageBean> versionBeanList;
+    private List<ImageBean> mVersionBeanList;
 
     /**
      * 构造函数
@@ -34,7 +34,7 @@ public class OtaListViewAdapter extends BaseAdapter{
      */
     public OtaListViewAdapter(Context context, List<ImageBean> versionBeanList) {
         this.mContext = context;
-        this.versionBeanList = versionBeanList;
+        this.mVersionBeanList = versionBeanList;
     }
 
     /**
@@ -44,7 +44,7 @@ public class OtaListViewAdapter extends BaseAdapter{
      */
     @Override
     public int getCount() {
-        return versionBeanList.size();
+        return mVersionBeanList.size();
     }
 
     /**
@@ -97,7 +97,7 @@ public class OtaListViewAdapter extends BaseAdapter{
             view = View.inflate(mContext, R.layout.ota_listview, null);
         }
 
-        ImageBean versionBean = versionBeanList.get(position);
+        ImageBean versionBean = mVersionBeanList.get(position);
         if (versionBean == null) {
             versionBean = new ImageBean("NoName");
         }
@@ -107,8 +107,8 @@ public class OtaListViewAdapter extends BaseAdapter{
         nameTextView.setText(versionBean.getPreVersion());
 
         final int removePosition = position;
-        final String preVersion = versionBeanList.get(removePosition).getPreVersion();
-        final String location = versionBeanList.get(removePosition).getLocation();
+        final String preVersion = mVersionBeanList.get(removePosition).getPreVersion();
+        final String location = mVersionBeanList.get(removePosition).getLocation();
 
         //下载按钮点击事件
         Button downloadOtaButton = (Button) view.findViewById(R.id.showDownLoadOtaButton);
@@ -126,7 +126,7 @@ public class OtaListViewAdapter extends BaseAdapter{
     }
 
     private void deleteButtonAction(int position) {
-        versionBeanList.remove(position);
+        mVersionBeanList.remove(position);
 
         //notifyDataSetChanged();
     }

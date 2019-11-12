@@ -127,6 +127,7 @@ public class ImageListViewAdapter extends BaseAdapter{
                 while (cursor.moveToNext()) {
                      dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
                 }
+                cursor.close();
                 try{
                     String url  = "/image/version/delete?id="+dbid;
                     String result = new CommonRequest().sendDelete(url);

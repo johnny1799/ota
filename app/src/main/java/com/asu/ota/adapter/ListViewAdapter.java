@@ -130,6 +130,7 @@ public class ListViewAdapter extends BaseAdapter{
                 while (cursor.moveToNext()) {
                      dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
                 }
+                cursor.close();
                 try{
                     //判断网路是否畅通加权限
                     if(NetWorkUtil.isNetAvailable(mContext)){//网络畅通
@@ -200,6 +201,7 @@ public class ListViewAdapter extends BaseAdapter{
                                                     while (cursor.moveToNext()) {
                                                         dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
                                                     }
+                                                    cursor.close();
                                                     String url  = "/product/edit?id="+dbid+"&name="+nname+"&comment=";
                                                     String result = new CommonRequest().sendPut(url);
                                                     JSONObject jo = new JSONObject(new String(result));
