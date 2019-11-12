@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -124,10 +123,9 @@ public class ListViewAdapter extends BaseAdapter{
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SQLiteDatabase db = ProductActivity.helper.getWritableDatabase();
 
                 int dbid = 0;
-                Cursor cursor = db.rawQuery("select dbid from product where name=?",new String[]{name});
+                Cursor cursor = ProductActivity.contentResolver.query(ProductActivity.uri, new String[]{"dbid"}, "name=?", new String[]{name}, null, null);
                 while (cursor.moveToNext()) {
                      dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
                 }
@@ -138,12 +136,11 @@ public class ListViewAdapter extends BaseAdapter{
                     Integer code = (Integer)jo.get("code");
                     if(code==0){
                         //数据库删除
-                        db.delete("Product", "name = ?", new String[]{name});
-
+                        ProductActivity.contentResolver.delete(ProductActivity.uri,"name = ?",new String[]{name});
                         deleteButtonAction(removePosition);
 
                         //重新加载列表
-                        ProductActivity.query(db);
+                        ProductActivity.query();
                     }
                 }catch(Exception e){
                     e.printStackTrace();
@@ -189,10 +186,9 @@ public class ListViewAdapter extends BaseAdapter{
                                                     "请输入要修改的产品名称", Toast.LENGTH_SHORT)
                                                     .show();
                                         } else {
-                                            SQLiteDatabase db = ProductActivity.helper.getWritableDatabase();
                                             try{
                                                 int dbid = 0;
-                                                Cursor cursor = db.rawQuery("select dbid from product where name=?",new String[]{name});
+                                                Cursor cursor = ProductActivity.contentResolver.query(ProductActivity.uri, new String[]{"dbid"}, "name=?", new String[]{name}, null, null);
                                                 while (cursor.moveToNext()) {
                                                     dbid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
                                                 }
@@ -203,9 +199,9 @@ public class ListViewAdapter extends BaseAdapter{
                                                 if(code == 0){
                                                     ContentValues values = new ContentValues();
                                                     values.put("name",nname);
-                                                    db.update("Product",values,"name=?",new String[] {name});
+                                                    ProductActivity.contentResolver.update(ProductActivity.uri, values, "name = ?", new String[]{name});
                                                     //重新加载列表
-                                                    ProductActivity.query(db);
+                                                    ProductActivity.query();
 
                                                     Toast.makeText(
                                                             mContext,
