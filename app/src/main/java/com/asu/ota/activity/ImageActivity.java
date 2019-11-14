@@ -60,22 +60,21 @@ public class ImageActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        super.onCreate(savedInstanceState);
+
         //网络连接不能放在主线程
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.image_main);
 
         Intent intent = getIntent();
         //产品id
         sProductId = intent.getIntExtra("productId",0);
-
         //加载数据库
         sHelper = new DatabaseHelper(this);
         sHelper.getWritableDatabase();
-
         this.sContext = this;
 
         //加载listview
